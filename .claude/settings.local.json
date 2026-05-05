@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\\\Users\\\\AD Corp\\\\Desktop\\\\어플리케이션\")",
+      "Bash(npm --version)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes --name love-analysis-app)",
+      "Read(//c/Users/AD Corp/Desktop/**)",
+      "Bash(npx create-next-app@latest love-analysis-app --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(powershell -Command ' *)",
+      "Bash(Remove-Item -Recurse -Force \"C:\\\\Users\\\\AD Corp\\\\Desktop\\\\love-analysis-app\")",
+      "Bash(Select-Object Name)",
+      "Bash(rm -rf \"C:\\\\Users\\\\AD Corp\\\\Desktop\\\\어플리케이션\\\\.next\")",
+      "Bash(npm install *)"
+    ]
+  }
+}
