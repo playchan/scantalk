@@ -2,6 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { safeRedirectPath } from '@/lib/redirect'
+import { trackEvent } from '@/app/actions/tracking'
 
 export type AuthState = { error: string } | { message: string } | null
 
@@ -12,13 +14,6 @@ function toKorean(message: string): string {
   if (message.includes('Password should be at least')) return '비밀번호는 6자 이상이어야 합니다.'
   if (message.includes('Unable to validate email address')) return '올바른 이메일 형식이 아닙니다.'
   return '오류가 발생했습니다. 다시 시도해주세요.'
-}
-
-// 오픈 리다이렉트 방지 — 내부 경로만 허용
-function safeRedirectPath(value: FormDataEntryValue | null): string {
-  const path = typeof value === 'string' ? value : ''
-  if (path.startsWith('/') && !path.startsWith('//')) return path
-  return '/dashboard'
 }
 
 export async function signIn(_prev: AuthState, formData: FormData): Promise<AuthState> {
@@ -50,6 +45,9 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   })
 
   if (error) return { error: toKorean(error.message) }
+
+  // 가입 성공 시점에 정확히 1회 기록 (복귀 페이지 재방문으로 인한 중복 집계 방지)
+  await trackEvent('signup_complete')
 
   // 이메일 인증 비활성화 상태면 세션이 바로 생성됨
   if (data.session) redirect(redirectTo)

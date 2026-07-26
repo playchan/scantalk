@@ -8,6 +8,16 @@ import { trackEvent } from '@/app/actions/tracking'
 
 export type QuizActionState = { error: string } | { success: true } | null
 
+// 검사 완료 이벤트 — 결과값을 클라이언트에 노출하지 않기 위해 서버에서 계산해 기록
+export async function trackQuizComplete(answers: Answers): Promise<void> {
+  const result = calcQuizResult(answers)
+  if (!result) return
+  await trackEvent('quiz_complete', {
+    probability: result.probability,
+    result_type: result.resultType,
+  })
+}
+
 // 검사 결과 저장 — 가입 완료 후 호출됨 (응답은 sessionStorage에서 전달)
 export async function saveQuizResult(answers: Answers): Promise<QuizActionState> {
   const supabase = await createClient()
@@ -17,6 +27,21 @@ export async function saveQuizResult(answers: Answers): Promise<QuizActionState>
 
   const result = calcQuizResult(answers)
   if (!result) return { error: '검사 응답이 올바르지 않습니다. 검사를 다시 진행해주세요.' }
+
+  // 멱등성: 같은 응답이 이미 저장돼 있으면 재삽입하지 않고 기존 결과로 이동
+  // (가입 복귀 페이지 새로고침/뒤로가기로 인한 중복 저장 방지)
+  const { data: existing } = await supabase
+    .from('quiz_results')
+    .select('id, answers')
+    .eq('user_id', user.id)
+    .eq('quiz_slug', QUIZ_SLUG)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (existing && JSON.stringify(existing.answers) === JSON.stringify(answers)) {
+    redirect(`/quiz/marriage/result/${existing.id}`)
+  }
 
   const cookieStore = await cookies()
   const sessionId = cookieStore.get('st_sid')?.value ?? 'unknown'
@@ -54,6 +79,15 @@ export async function preregister(
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
+
+  // 소유 검증 — RLS가 본인 결과만 돌려주므로 조회 성공 = 본인 소유
+  const { data: owned } = await supabase
+    .from('quiz_results')
+    .select('id')
+    .eq('id', quizResultId)
+    .maybeSingle()
+
+  if (!owned) return { error: '잘못된 요청입니다.' }
 
   const { error } = await supabase.from('preregistrations').insert({
     user_id: user.id,

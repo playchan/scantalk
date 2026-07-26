@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { validateAnswers, type Answers } from '@/lib/quiz/marriage'
 import { saveQuizResult } from '@/app/actions/quiz'
-import { trackEvent } from '@/app/actions/tracking'
 import { ANSWERS_STORAGE_KEY } from '../QuizFlow'
 
 export default function CompleteClient() {
@@ -16,13 +15,17 @@ export default function CompleteClient() {
     if (started.current) return
     started.current = true
 
+    let raw: string | null = null
     let stored: Answers | null = null
     try {
-      const raw = sessionStorage.getItem(ANSWERS_STORAGE_KEY)
+      raw = sessionStorage.getItem(ANSWERS_STORAGE_KEY)
       if (raw) {
         const parsed: unknown = JSON.parse(raw)
         if (parsed && typeof parsed === 'object') stored = parsed as Answers
       }
+      // 저장 요청 전에 먼저 비운다 — 새로고침으로 인한 중복 제출 방지.
+      // (서버 액션도 동일 응답 재제출 시 기존 결과로 보내는 멱등 처리가 되어 있음)
+      sessionStorage.removeItem(ANSWERS_STORAGE_KEY)
     } catch {
       stored = null
     }
@@ -33,17 +36,19 @@ export default function CompleteClient() {
       return
     }
 
-    void trackEvent('signup_complete')
-
     const answers = stored
+    const rawBackup = raw
     void (async () => {
       const state = await saveQuizResult(answers)
       // 성공 시 서버 액션이 결과 페이지로 redirect — 여기 도달하면 실패
-      if (state !== null && 'error' in state) setError(state.error)
-      try {
-        sessionStorage.removeItem(ANSWERS_STORAGE_KEY)
-      } catch {
-        // 정리 실패는 무시해도 안전
+      if (state !== null && 'error' in state) {
+        setError(state.error)
+        // 실패 시 응답 복원 — 재시도 가능하게
+        try {
+          if (rawBackup) sessionStorage.setItem(ANSWERS_STORAGE_KEY, rawBackup)
+        } catch {
+          // 복원 실패 시 검사 재진행으로 안내됨
+        }
       }
     })()
   }, [router])

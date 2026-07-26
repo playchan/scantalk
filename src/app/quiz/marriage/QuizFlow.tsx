@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { QUESTIONS, calcQuizResult, type Answers } from '@/lib/quiz/marriage'
-import { saveQuizResult } from '@/app/actions/quiz'
+import { QUESTIONS, type Answers } from '@/lib/quiz/marriage'
+import { saveQuizResult, trackQuizComplete } from '@/app/actions/quiz'
 import { trackEvent } from '@/app/actions/tracking'
 
 export const ANSWERS_STORAGE_KEY = 'st_quiz_marriage_answers'
@@ -31,7 +31,6 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
 
   const question = QUESTIONS[index]
   const progress = Math.round((index / QUESTIONS.length) * 100)
-  const result = stage === 'preview' ? calcQuizResult(answers) : null
 
   function handleStart() {
     setStage('questions')
@@ -48,18 +47,15 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
       return
     }
 
-    // 완료 — 응답을 임시 보관하고 미리보기로
-    const completed = calcQuizResult(next)
+    // 완료 — 응답을 임시 보관하고 미리보기로.
+    // 결과 계산은 서버에서만 — 실제 값이 가입 전 클라이언트에 노출되면 안 됨
     try {
       sessionStorage.setItem(ANSWERS_STORAGE_KEY, JSON.stringify(next))
     } catch {
       // 시크릿 모드 등에서 실패해도 진행은 가능 (로그인 유저는 바로 저장됨)
     }
     setStage('preview')
-    void trackEvent('quiz_complete', {
-      probability: completed?.probability ?? 0,
-      result_type: completed?.resultType ?? 'unknown',
-    })
+    void trackQuizComplete(next)
   }
 
   function handleBack() {
@@ -157,14 +153,14 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
           </div>
         )}
 
-        {stage === 'preview' && result && (
+        {stage === 'preview' && (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
             <p className="text-sm text-gray-500 mb-3">나의 결혼 확률은...</p>
 
-            {/* 블러 처리된 결과 — 가입 후 공개 */}
+            {/* 실제 값은 서버에만 있음 — 가입 후 결과 페이지에서 공개 */}
             <div className="relative mb-8">
-              <div className="text-7xl font-extrabold text-rose-500 blur-lg select-none" aria-hidden>
-                {result.probability}%
+              <div className="text-7xl font-extrabold text-rose-200 select-none" aria-hidden>
+                ??%
               </div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-4xl">🔒</span>
