@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import Link from 'next/link'
 import { signIn, type AuthState } from '@/app/actions/auth'
+import RedirectField from '@/components/RedirectField'
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState<AuthState, FormData>(signIn, null)
@@ -23,6 +24,7 @@ export default function LoginPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-5">로그인</h2>
 
         <form action={formAction} className="space-y-4">
+          <RedirectField />
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
               이메일

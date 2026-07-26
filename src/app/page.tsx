@@ -81,6 +81,19 @@ export default async function LandingPage() {
         </div>
       </nav>
 
+      {/* 바이럴 검사 배너 */}
+      <Link
+        href="/quiz/marriage"
+        className="block bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 transition-colors"
+      >
+        <div className="max-w-[500px] mx-auto px-5 py-3 flex items-center justify-between">
+          <span className="text-sm font-bold text-white">
+            💍 내가 결혼할 확률은? <span className="font-normal opacity-90">90초 무료 테스트</span>
+          </span>
+          <span className="text-white text-sm">→</span>
+        </div>
+      </Link>
+
       {/* 히어로 */}
       <section className="bg-gray-950 text-white px-5 pt-20 pb-24">
         <div className="max-w-[500px] mx-auto text-center">

@@ -14,35 +14,45 @@ function toKorean(message: string): string {
   return '오류가 발생했습니다. 다시 시도해주세요.'
 }
 
+// 오픈 리다이렉트 방지 — 내부 경로만 허용
+function safeRedirectPath(value: FormDataEntryValue | null): string {
+  const path = typeof value === 'string' ? value : ''
+  if (path.startsWith('/') && !path.startsWith('//')) return path
+  return '/dashboard'
+}
+
 export async function signIn(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
+  const redirectTo = safeRedirectPath(formData.get('redirect_to'))
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) return { error: toKorean(error.message) }
 
-  redirect('/dashboard')
+  redirect(redirectTo)
 }
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
+  const redirectTo = safeRedirectPath(formData.get('redirect_to'))
 
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      // 이메일 인증 후에도 원래 목적지로 복귀 (callback의 next 파라미터)
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
     },
   })
 
   if (error) return { error: toKorean(error.message) }
 
   // 이메일 인증 비활성화 상태면 세션이 바로 생성됨
-  if (data.session) redirect('/dashboard')
+  if (data.session) redirect(redirectTo)
 
   return { message: '가입 이메일을 발송했습니다. 메일함을 확인해주세요.' }
 }
