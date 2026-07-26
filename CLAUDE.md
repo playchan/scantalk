@@ -23,6 +23,17 @@
 → 사용자 리포트 확인
 → 매칭 신청
 
+v2(라운드제)부터는 무료 바이럴 검사가 유입 엔진으로 추가된다.
+
+바이럴 검사 유입 (비로그인)
+→ "내가 결혼할 확률은?" 12문항
+→ 결과 미리보기 → 간편 가입
+→ 결과 확인 + 공유 카드
+→ 매칭 사전신청
+
+v2 전체 전략과 라운드 계획은 docs/09-viral-ai-matching-plan.md,
+라운드 1 상세 명세는 docs/10-v2-mvp-spec.md를 기준으로 한다.
+
 ## 2. 작업 환경
 
 이 프로젝트는 VS Code에서 작업한다.
@@ -78,6 +89,9 @@
 - 결제 안내
 - 분석 결과 확인
 - 매칭 신청
+- 바이럴 무료 검사 (비로그인 진행, 라운드 1)
+- 검사 결과 공유 카드
+- 매칭 사전신청
 
 ### 관리자 기능
 
@@ -92,6 +106,7 @@
 - 최종 리포트 저장
 - 리포트 공개 여부 변경
 - 매칭 신청자 조회
+- 인사이트 대시보드 v1 (유입·전환 KPI, 퍼널, 채널별 — /admin/insights)
 
 ## 5. 1차 MVP 제외 기능
 
@@ -112,7 +127,8 @@
 - 카카오 로그인
 - 추천인 시스템
 - 포인트 시스템
-- 고도화된 관리자 통계 대시보드
+- 고도화된 관리자 통계 대시보드 (단, 라운드 1의 인사이트 v1 — KPI·퍼널·채널 집계 — 는 포함)
+- AI봇 생성·봇 대화·호감도 시스템 (라운드 2~3에서 착수, docs/09 참고)
 
 이 기능들은 유료 결제 30건 이상, 성향 테스트 100건 이상, 매칭 신청자 100명 이상이 쌓인 뒤 검토한다.
 
@@ -195,6 +211,12 @@ AI 분석 결과는 건강한 관계, 존중 있는 대화, 사용자의 감정 
 - match_applications
 - matches
 
+v2 라운드 1에서 추가된 테이블:
+
+- quiz_results (바이럴 검사 결과, 4축 성향 포함)
+- preregistrations (매칭 사전신청, 1인 1건)
+- events (퍼널 이벤트 — service_role 전용, RLS 정책 없음)
+
 테이블을 추가하기 전에는 기존 테이블로 해결 가능한지 먼저 검토한다.
 
 ## 11. 권한 정책
@@ -244,14 +266,16 @@ VS Code에서는 다음 방식으로 작업한다.
 반드시 확인할 문서:
 
 - CLAUDE.md
-- docs/00_PROJECT_BRIEF.md
-- docs/01_PRD.md
-- docs/02_USER_FLOW.md
-- docs/03_ADMIN_FLOW.md
-- docs/04_DB_SCHEMA.md
-- docs/05_AI_PROMPT.md
-- docs/06_SECURITY_POLICY.md
-- docs/07_BUILD_PLAN.md
+- docs/01-PRD.md
+- docs/02-architecture.md
+- docs/03-db-schema.md
+- docs/04-ui-flow.md
+- docs/05-security-checklist.md
+- docs/06-business-model.md
+- docs/07-roadmap.md
+- docs/08-ai-prompt-guide.md
+- docs/09-viral-ai-matching-plan.md (v2 전략·라운드 계획)
+- docs/10-v2-mvp-spec.md (라운드 1 상세 명세)
 
 작업 전에는 다음을 먼저 판단한다.
 
