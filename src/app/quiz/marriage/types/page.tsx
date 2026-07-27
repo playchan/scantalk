@@ -97,7 +97,7 @@ export default function QuizTypesReviewPage() {
         </div>
 
         {/* 문항 62종 */}
-        <h2 className="text-base font-bold text-gray-900 mb-1">문항 62종 — 남/녀 각 59문항 응답 (약 7분)</h2>
+        <h2 className="text-base font-bold text-gray-900 mb-1">문항 68종 — 남/녀 각 65문항 응답 (약 8분)</h2>
         <p className="text-xs text-gray-400 mb-3">
           카테고리: 프로필·취향은 AI봇 프로필 재료(축 영향 없음), 성격·상황은 성향 축 산출.
           성별 배지가 있는 문항은 해당 성별에게만 출제. 구조(카테고리·성별·축 매핑)는 유지하고 텍스트만 교체 가능.

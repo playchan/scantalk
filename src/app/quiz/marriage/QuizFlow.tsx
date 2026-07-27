@@ -141,7 +141,10 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
             >
               테스트 시작하기
             </button>
-            <p className="text-xs text-gray-400 mt-4">59개 질문 · 약 7분 심층 분석 · 가입 없이 바로 시작</p>
+            <p className="text-xs text-gray-400 mt-4">65개 질문 · 약 8분 심층 분석 · 가입 없이 바로 시작</p>
+            <p className="text-[11px] text-gray-400 mt-1.5">
+              🧠 애착 이론 · 사랑의 언어 등 관계심리학 프레임 기반
+            </p>
           </div>
         )}
 

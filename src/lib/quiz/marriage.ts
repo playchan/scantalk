@@ -15,13 +15,14 @@ export const GENDER_LABELS: Record<Gender, string> = {
   female: '여성',
 }
 
-export type AxisKey = 'expression' | 'pace' | 'independence' | 'stability'
+export type AxisKey = 'expression' | 'pace' | 'independence' | 'stability' | 'intimacy'
 
 export const AXIS_LABELS: Record<AxisKey, string> = {
-  expression: '표현 방식',
-  pace: '관계 속도',
+  expression: '표현력',
+  pace: '추진력',
+  intimacy: '친밀함',
+  stability: '안정감',
   independence: '독립성',
-  stability: '안정 지향',
 }
 
 export type QuestionCategory = 'profile' | 'personality' | 'preference' | 'situation'
@@ -52,7 +53,8 @@ export interface QuizQuestion {
   options: QuizOption[]
 }
 
-// 문항 62종 정의 (공통 56 + 남성 전용 3 + 여성 전용 3) — 응답 기준 59문항.
+// 문항 68종 정의 (공통 62 + 남성 전용 3 + 여성 전용 3) — 응답 기준 65문항.
+// 선택지는 4~5개. 애착 이론·사랑의 언어 등 관계심리학 프레임을 참고해 설계.
 // 카피 교체 시 구조(카테고리·성별·축 매핑·p값)는 유지.
 export const QUESTIONS: QuizQuestion[] = [
   // ══════ PART 0. 나에 대하여 (프로필) ══════
@@ -240,6 +242,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 's1b', label: '자연스럽게 마주칠 자리를 만든다', axis: 'pace', score: 2, p: 2 },
       { id: 's1c', label: '상대가 다가올 때까지 신호만 보낸다', axis: 'stability', score: 2, p: 0 },
       { id: 's1d', label: '혼자 마음을 정리하다 타이밍을 놓친다', axis: 'independence', score: 3, p: -2 },
+      { id: 's1e', label: '일단 SNS부터 정독한다 (조용한 탐색전)', axis: 'intimacy', score: 1, p: 0 },
     ],
   },
   {
@@ -286,6 +289,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 't1b', label: '한두 달은 서로 알아가야지', axis: 'stability', score: 2, p: 2 },
       { id: 't1c', label: '기간보다 확신이 중요하다', axis: 'stability', score: 3, p: 1 },
       { id: 't1d', label: '썸 자체가 제일 재밌는 구간인데 왜 끝내', axis: 'independence', score: 2, p: -1 },
+      { id: 't1e', label: '썸이 뭔가요? 저는 항상 바로 사귀던데', axis: 'expression', score: 1, p: 1 },
     ],
   },
   {
@@ -332,6 +336,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'h1b', label: '친구들과 왁자지껄 모임', axis: 'pace', score: 2, p: 1 },
       { id: 'h1c', label: '운동이나 자기계발로 나를 채우기', axis: 'stability', score: 2, p: 1 },
       { id: 'h1d', label: '집에서 완벽한 혼자만의 휴식', axis: 'independence', score: 3, p: -1 },
+      { id: 'h1e', label: '침대와 물아일체. 주말은 신성한 충전일', axis: 'independence', score: 1, p: 0 },
     ],
   },
   {
@@ -400,6 +405,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'c1b', label: '하루 정도 정리하고 차분히 말한다', axis: 'stability', score: 3, p: 3 },
       { id: 'c1c', label: '시간이 해결해줄 때까지 둔다 (동굴형)', axis: 'independence', score: 2, p: -1 },
       { id: 'c1d', label: '먼저 사과받기 전엔 말 안 한다', axis: 'pace', score: 1, p: -2 },
+      { id: 'c1e', label: '일단 개그로 분위기 풀고 본론은 나중에', axis: 'intimacy', score: 1, p: 1 },
     ],
   },
   {
@@ -468,6 +474,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'e1b', label: '쓸 건 쓰고 남으면 모은다', axis: 'pace', score: 2, p: 1 },
       { id: 'e1c', label: '경험에 쓰는 게 남는 것', axis: 'expression', score: 2, p: 0 },
       { id: 'e1d', label: '통장 잔고를 잘 안 본다', axis: 'independence', score: 2, p: -2 },
+      { id: 'e1e', label: '월급은 통장을 스칠 뿐… (텅장 인증)', axis: 'pace', score: 1, p: -1 },
     ],
   },
   {
@@ -590,7 +597,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'f4a', label: '"보고 싶다", "잘했어" 같은 말 한마디', axis: 'expression', score: 0, p: 1 },
       { id: 'f4b', label: '나를 위해 시간을 내어줄 때', axis: 'stability', score: 0, p: 1 },
       { id: 'f4c', label: '작은 선물과 서프라이즈', axis: 'pace', score: 0, p: 1 },
-      { id: 'f4d', label: '손잡기, 포옹 같은 스킨십', axis: 'independence', score: 0, p: 1 },
+      { id: 'f4d', label: '손잡기, 포옹 같은 스킨십', axis: 'intimacy', score: 1, p: 1 },
     ],
   },
   {
@@ -626,6 +633,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'x1b', label: '"잘 지내지~" 예의상 답하고 끝', axis: 'stability', score: 2, p: 1 },
       { id: 'x1c', label: '무슨 일인지 궁금해서 대화가 길어진다', axis: 'expression', score: 2, p: 0 },
       { id: 'x1d', label: '혹시…? 하는 마음에 잠이 안 온다', axis: 'pace', score: 1, p: -1 },
+      { id: 'x1e', label: '스크린샷 찍어서 단톡방 긴급 소집', axis: 'expression', score: 1, p: 0 },
     ],
   },
   {
@@ -637,6 +645,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'x2b', label: '사진 말고 어떤 사람인지부터 물어본다', axis: 'stability', score: 2, p: 2 },
       { id: 'x2c', label: '"생각해볼게" 하고 일주일째 고민 중', axis: 'independence', score: 2, p: 0 },
       { id: 'x2d', label: '"괜찮아~" 자연스러운 만남을 원한다', axis: 'independence', score: 2, p: -1 },
+      { id: 'x2e', label: '"근데 그분도 내 소개 받는 거 알아?" 역검증 모드', axis: 'stability', score: 1, p: 1 },
     ],
   },
   {
@@ -651,6 +660,82 @@ export const QUESTIONS: QuizQuestion[] = [
     ],
   },
 
+  // ══════ PART 7.5. 마음의 습관 (애착 이론 기반) ══════
+  {
+    id: 'at1',
+    title: '연인의 연락이 하루 종일 뜸하다. 나의 진짜 속마음은',
+    category: 'personality',
+    options: [
+      { id: 'at1a', label: '솔직하게 서운했다고 말한다', axis: 'expression', score: 3, p: 3 },
+      { id: 'at1b', label: '바쁜가 보다, 하던 일 계속한다', axis: 'stability', score: 3, p: 2 },
+      { id: 'at1c', label: '불안해서 프로필 사진만 세 번 확인', axis: 'intimacy', score: 2, p: 0 },
+      { id: 'at1d', label: '나도 똑같이 뜸해진다. 눈에는 눈', axis: 'independence', score: 2, p: -1 },
+      { id: 'at1e', label: '연락 없는 김에 나 혼자 더 재밌게 논다', axis: 'pace', score: 1, p: 0 },
+    ],
+  },
+  {
+    id: 'at2',
+    title: '관계가 깊어질수록 나는 (솔직하게!)',
+    category: 'personality',
+    options: [
+      { id: 'at2a', label: '점점 더 편안하고 안정감을 느낀다', axis: 'stability', score: 3, p: 3 },
+      { id: 'at2b', label: '더 잘해주고 싶어서 애가 탄다', axis: 'intimacy', score: 3, p: 2 },
+      { id: 'at2c', label: '상대가 떠날까 봐 가끔 불안해진다', axis: 'expression', score: 1, p: 0 },
+      { id: 'at2d', label: '문득 혼자 도망가고 싶은 순간이 온다', axis: 'independence', score: 2, p: -2 },
+      { id: 'at2e', label: '깊어진다는 게 뭔지 아직 잘 모르겠다', axis: 'pace', score: 1, p: -1 },
+    ],
+  },
+
+  // ══════ PART 7.7. 케미와 친밀함 ══════
+  {
+    id: 'ch1',
+    title: '연애에서 스킨십 진도, 나의 스타일은',
+    category: 'personality',
+    options: [
+      { id: 'ch1a', label: '마음이 통하면 자연스럽게. 흐름파', axis: 'intimacy', score: 2, p: 2 },
+      { id: 'ch1b', label: '상대의 속도에 맞추는 게 매너', axis: 'stability', score: 3, p: 3 },
+      { id: 'ch1c', label: '천천히. 손잡기까지의 설렘도 소중해', axis: 'intimacy', score: 1, p: 1 },
+      { id: 'ch1d', label: '진도보다 마음의 교감이 먼저', axis: 'expression', score: 1, p: 1 },
+      { id: 'ch1e', label: '이런 질문… 좀 부끄러운데요 🙈', axis: 'independence', score: 1, p: 0 },
+    ],
+  },
+  {
+    id: 'ch2',
+    title: '애정과 성에 대한 대화, 연인과 나눌 수 있을까',
+    category: 'personality',
+    options: [
+      { id: 'ch2a', label: '필요하면 솔직하게. 건강한 관계의 핵심 대화', axis: 'intimacy', score: 3, p: 3 },
+      { id: 'ch2b', label: '신뢰가 쌓이면 조심스럽게 가능', axis: 'stability', score: 2, p: 2 },
+      { id: 'ch2c', label: '민망해서 빙빙 돌려 말할 것 같다', axis: 'expression', score: 1, p: 0 },
+      { id: 'ch2d', label: '그런 건 말없이 통해야 하는 것', axis: 'independence', score: 2, p: -1 },
+      { id: 'ch2e', label: '사랑엔 대화보다 눈빛 아닌가요', axis: 'intimacy', score: 1, p: 1 },
+    ],
+  },
+  {
+    id: 'ch3',
+    title: '이상적인 애정 표현의 빈도는',
+    category: 'personality',
+    options: [
+      { id: 'ch3a', label: '매일 포옹, 수시로 손잡기. 표현은 습관', axis: 'intimacy', score: 3, p: 2 },
+      { id: 'ch3b', label: '만날 때마다 자연스럽게', axis: 'intimacy', score: 2, p: 2 },
+      { id: 'ch3c', label: '특별한 날, 특별한 순간에 진하게', axis: 'pace', score: 1, p: 1 },
+      { id: 'ch3d', label: 'TPO는 지키자. 공공장소는 손만', axis: 'stability', score: 2, p: 1 },
+      { id: 'ch3e', label: '표현은… 마음속으로 (수줍음 주의)', axis: 'independence', score: 1, p: -1 },
+    ],
+  },
+  {
+    id: 'ch4',
+    title: '잠자리 케미, 오래가는 관계에서 얼마나 중요할까',
+    category: 'personality',
+    options: [
+      { id: 'ch4a', label: '매우 중요. 부부 사이의 온도계다', axis: 'intimacy', score: 3, p: 2 },
+      { id: 'ch4b', label: '중요하지만 신뢰와 대화가 우선', axis: 'stability', score: 2, p: 2 },
+      { id: 'ch4c', label: '서로 다른 게 당연. 맞춰가면 된다', axis: 'intimacy', score: 2, p: 3 },
+      { id: 'ch4d', label: '시간이 지나면 정으로 사는 것', axis: 'pace', score: 1, p: 0 },
+      { id: 'ch4e', label: '노코멘트 하겠습니다 😳', axis: 'independence', score: 1, p: 0 },
+    ],
+  },
+
   // ══════ PART 8. 결혼이라는 미래 ══════
   {
     id: 'k1',
@@ -661,6 +746,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'k1b', label: '준비가 되면 자연스럽게 하고 싶다', axis: 'stability', score: 3, p: 2 },
       { id: 'k1c', label: '해도 그만 안 해도 그만', axis: 'independence', score: 2, p: -1 },
       { id: 'k1d', label: '내 자유가 사라질까 겁난다', axis: 'independence', score: 3, p: -2 },
+      { id: 'k1e', label: '이 테스트를 하는 이유가 바로 그것', axis: 'expression', score: 1, p: 2 },
     ],
   },
   {
@@ -712,9 +798,9 @@ export const QUESTIONS: QuizQuestion[] = [
     title: '스킨십과 애정 표현, 관계에서 얼마나 중요할까',
     category: 'personality',
     options: [
-      { id: 'k6a', label: '매우 중요. 애정을 확인하는 핵심 언어', axis: 'expression', score: 3, p: 2 },
+      { id: 'k6a', label: '매우 중요. 애정을 확인하는 핵심 언어', axis: 'intimacy', score: 3, p: 2 },
       { id: 'k6b', label: '중요하지만 깊은 대화가 더 중요', axis: 'stability', score: 2, p: 2 },
-      { id: 'k6c', label: '적당한 수준이면 충분', axis: 'pace', score: 1, p: 1 },
+      { id: 'k6c', label: '적당한 수준이면 충분', axis: 'intimacy', score: 1, p: 1 },
       { id: 'k6d', label: '표현이 없어도 마음만 있으면 된다', axis: 'independence', score: 2, p: -1 },
     ],
   },
@@ -738,6 +824,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'k8b', label: '소중한 사람만 모은 아늑한 스몰웨딩', axis: 'stability', score: 2, p: 3 },
       { id: 'k8c', label: '둘이서 떠나는 여행 결혼식', axis: 'independence', score: 2, p: 2 },
       { id: 'k8d', label: '식 자체를 생략하고 싶다', axis: 'independence', score: 2, p: -1 },
+      { id: 'k8e', label: '식은 상대가 원하는 대로. 결혼 자체가 중요', axis: 'stability', score: 1, p: 2 },
     ],
   },
   {
@@ -760,6 +847,7 @@ export const QUESTIONS: QuizQuestion[] = [
       { id: 'k10b', label: '둘이서 단단하게 사는 삶', axis: 'stability', score: 3, p: 3 },
       { id: 'k10c', label: '일과 사랑 모두 현재진행형', axis: 'pace', score: 2, p: 1 },
       { id: 'k10d', label: '자유로운 1인 라이프', axis: 'independence', score: 3, p: -2 },
+      { id: 'k10e', label: '상상 불가. 10년 뒤는 10년 뒤의 내가 알아서', axis: 'pace', score: 1, p: 0 },
     ],
   },
 ]
@@ -1092,7 +1180,13 @@ export function calcQuizResult(answers: Answers): QuizResultData | null {
   const gender = parseGender(answers)
   if (!gender || !validateAnswers(answers)) return null
 
-  const axes: Record<AxisKey, number> = { expression: 0, pace: 0, independence: 0, stability: 0 }
+  const axes: Record<AxisKey, number> = {
+    expression: 0,
+    pace: 0,
+    independence: 0,
+    stability: 0,
+    intimacy: 0,
+  }
   let pSum = 0
 
   questionsForGender(gender).forEach((q) => {

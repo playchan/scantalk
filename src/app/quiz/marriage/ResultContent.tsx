@@ -6,21 +6,146 @@ interface ResultContentProps {
   axes: Record<AxisKey, number>
 }
 
+// 펜타그램(5각 레이더)의 축 배치 순서 — 12시 방향부터 시계방향
+const RADAR_ORDER: AxisKey[] = ['expression', 'pace', 'intimacy', 'stability', 'independence']
+
+const RADAR_SIZE = 280
+const RADAR_CENTER = RADAR_SIZE / 2
+const RADAR_RADIUS = 96
+
+function radarPoint(index: number, ratio: number): [number, number] {
+  const angle = -Math.PI / 2 + (index * 2 * Math.PI) / 5
+  return [
+    RADAR_CENTER + Math.cos(angle) * RADAR_RADIUS * ratio,
+    RADAR_CENTER + Math.sin(angle) * RADAR_RADIUS * ratio,
+  ]
+}
+
+function polygonPoints(ratios: number[]): string {
+  return ratios.map((r, i) => radarPoint(i, r).join(',')).join(' ')
+}
+
+// 연애 성향 펜타그램 — 5축 레이더 차트 (순수 SVG)
+function RadarPentagon({ axes }: { axes: Record<AxisKey, number> }) {
+  const maxValue = Math.max(...RADAR_ORDER.map((a) => axes[a] ?? 0), 1)
+  const ratios = RADAR_ORDER.map((a) => Math.max((axes[a] ?? 0) / maxValue, 0.08))
+
+  return (
+    <svg
+      viewBox={`0 0 ${RADAR_SIZE} ${RADAR_SIZE}`}
+      className="w-full max-w-[280px] mx-auto"
+      role="img"
+      aria-label="연애 성향 펜타그램"
+    >
+      {/* 배경 그리드 */}
+      {[1, 0.66, 0.33].map((ring) => (
+        <polygon
+          key={ring}
+          points={polygonPoints([ring, ring, ring, ring, ring])}
+          fill={ring === 1 ? '#fff1f2' : 'none'}
+          stroke="#fecdd3"
+          strokeWidth="1"
+        />
+      ))}
+      {/* 축선 */}
+      {RADAR_ORDER.map((_, i) => {
+        const [x, y] = radarPoint(i, 1)
+        return (
+          <line
+            key={i}
+            x1={RADAR_CENTER}
+            y1={RADAR_CENTER}
+            x2={x}
+            y2={y}
+            stroke="#fecdd3"
+            strokeWidth="1"
+          />
+        )
+      })}
+      {/* 값 폴리곤 */}
+      <polygon
+        points={polygonPoints(ratios)}
+        fill="rgba(244, 63, 94, 0.25)"
+        stroke="#f43f5e"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* 꼭짓점 */}
+      {ratios.map((r, i) => {
+        const [x, y] = radarPoint(i, r)
+        return <circle key={i} cx={x} cy={y} r="4" fill="#f43f5e" />
+      })}
+      {/* 축 라벨 */}
+      {RADAR_ORDER.map((axis, i) => {
+        const [x, y] = radarPoint(i, 1.22)
+        return (
+          <text
+            key={axis}
+            x={x}
+            y={y + 4}
+            textAnchor="middle"
+            fontSize="12"
+            fontWeight="700"
+            fill="#6b7280"
+          >
+            {AXIS_LABELS[axis]}
+          </text>
+        )
+      })}
+    </svg>
+  )
+}
+
+// 확률 원형 게이지 — 유형 이모지가 중앙에
+function ProbabilityGauge({ probability, emoji }: { probability: number; emoji: string }) {
+  const radius = 84
+  const circumference = 2 * Math.PI * radius
+  const filled = (probability / 100) * circumference
+
+  return (
+    <div className="relative w-[200px] h-[200px] mx-auto">
+      <svg viewBox="0 0 200 200" className="w-full h-full -rotate-90">
+        <circle cx="100" cy="100" r={radius} fill="none" stroke="#ffe4e6" strokeWidth="14" />
+        <circle
+          cx="100"
+          cy="100"
+          r={radius}
+          fill="none"
+          stroke="url(#gaugeGradient)"
+          strokeWidth="14"
+          strokeLinecap="round"
+          strokeDasharray={`${filled} ${circumference - filled}`}
+        />
+        <defs>
+          <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fb7185" />
+            <stop offset="100%" stopColor="#e11d48" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-4xl leading-none mb-1">{emoji}</span>
+        <span className="text-4xl font-extrabold text-rose-500 leading-none">
+          {probability}
+          <span className="text-xl">%</span>
+        </span>
+      </div>
+    </div>
+  )
+}
+
 // 결과 리치 콘텐츠 — 실서비스 결과 페이지와 테스트 모드에서 공용 (순수 프레젠테이션)
 export default function ResultContent({ probability, typeDef, axes }: ResultContentProps) {
-  const maxAxisScore = Math.max(...Object.values(axes), 1)
   const bestMatchDef = getResultTypeDef(typeDef.bestMatch)
   const hardMatchDef = getResultTypeDef(typeDef.hardMatch)
 
   return (
     <>
-      {/* 헤더 */}
+      {/* 헤더 — 확률 게이지 */}
       <div className="text-center mb-6">
-        <p className="text-sm text-gray-500 mb-2">나의 결혼 확률은</p>
-        <p className="text-7xl font-extrabold text-rose-500 mb-3">{probability}%</p>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {typeDef.emoji} {typeDef.name}
-        </h1>
+        <p className="text-sm text-gray-500 mb-3">나의 결혼 확률은</p>
+        <ProbabilityGauge probability={probability} emoji={typeDef.emoji} />
+        <h1 className="text-2xl font-bold text-gray-900 mt-4">{typeDef.name}</h1>
         <p className="text-sm text-rose-400 font-semibold mt-1">"{typeDef.memeLine}"</p>
         <div className="flex flex-wrap justify-center gap-1.5 mt-3">
           {typeDef.keywords.map((k) => (
@@ -34,6 +159,12 @@ export default function ResultContent({ probability, typeDef, axes }: ResultCont
         </div>
       </div>
 
+      {/* 펜타그램 */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-3">
+        <h2 className="text-sm font-bold text-gray-900 mb-2 text-center">⭐ 연애 성향 펜타그램</h2>
+        <RadarPentagon axes={axes} />
+      </div>
+
       {/* 요약 */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-3">
         <p className="text-sm text-gray-700 leading-relaxed">{typeDef.summary}</p>
@@ -43,15 +174,13 @@ export default function ResultContent({ probability, typeDef, axes }: ResultCont
       <div className="grid grid-cols-2 gap-3 mb-3">
         <div className="bg-emerald-50 rounded-2xl border border-emerald-100 p-4 text-center">
           <p className="text-[11px] font-bold text-emerald-600 mb-1">💚 환상의 케미</p>
-          <p className="text-sm font-bold text-gray-900">
-            {bestMatchDef?.emoji} {typeDef.bestMatch}
-          </p>
+          <p className="text-2xl mb-1">{bestMatchDef?.emoji}</p>
+          <p className="text-sm font-bold text-gray-900">{typeDef.bestMatch}</p>
         </div>
         <div className="bg-orange-50 rounded-2xl border border-orange-100 p-4 text-center">
           <p className="text-[11px] font-bold text-orange-500 mb-1">🧨 환장의 케미</p>
-          <p className="text-sm font-bold text-gray-900">
-            {hardMatchDef?.emoji} {typeDef.hardMatch}
-          </p>
+          <p className="text-2xl mb-1">{hardMatchDef?.emoji}</p>
+          <p className="text-sm font-bold text-gray-900">{typeDef.hardMatch}</p>
         </div>
       </div>
 
@@ -102,23 +231,10 @@ export default function ResultContent({ probability, typeDef, axes }: ResultCont
         </ol>
       </div>
 
-      {/* 성향 축 */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-        <h2 className="text-sm font-bold text-gray-900 mb-4">📊 나의 연애 성향 분석</h2>
-        <div className="space-y-3">
-          {(Object.keys(AXIS_LABELS) as AxisKey[]).map((axis) => (
-            <div key={axis} className="flex items-center gap-3">
-              <span className="text-xs text-gray-500 w-16">{AXIS_LABELS[axis]}</span>
-              <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-rose-400 rounded-full"
-                  style={{ width: `${Math.round((axes[axis] / maxAxisScore) * 100)}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <p className="text-center text-[11px] text-gray-400 leading-relaxed mb-4">
+        🧠 애착 이론 · 사랑의 언어(5 Love Languages) 등<br />
+        관계심리학 프레임워크를 참고해 설계된 검사입니다
+      </p>
     </>
   )
 }
