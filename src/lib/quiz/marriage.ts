@@ -168,7 +168,7 @@ const PROBABILITY_MIN = 35
 const PROBABILITY_MAX = 95
 const PROBABILITY_BASE = 50
 
-interface ResultTypeDef {
+export interface ResultTypeDef {
   name: string
   summary: string
   strength: string
@@ -220,6 +220,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
     memeLine: '인연은 오는 것, 쫓는 것 아님',
   },
 }
+
+// 카피 검수용 전체 유형 목록 (key = 확률구간-스타일)
+export const RESULT_TYPE_LIST: Array<{ key: string } & ResultTypeDef> = Object.entries(
+  RESULT_TYPES,
+).map(([key, def]) => ({ key, ...def }))
 
 function isCompleteAnswers(answers: Answers): boolean {
   return QUESTIONS.every((q) => {
