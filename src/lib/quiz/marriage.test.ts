@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import {
   QUESTIONS,
+  RESULT_TYPE_LIST,
   calcQuizResult,
   getResultTypeDef,
   validateAnswers,
@@ -16,8 +17,8 @@ function answersByIndex(optionIndex: number): Answers {
 }
 
 describe('QUESTIONS 구조', () => {
-  test('문항은 정확히 12개다', () => {
-    expect(QUESTIONS).toHaveLength(12)
+  test('문항은 정확히 24개다 (약 5분 분량)', () => {
+    expect(QUESTIONS).toHaveLength(24)
   })
 
   test('모든 문항은 4지선다이고 옵션 id가 전역에서 고유하다', () => {
@@ -121,11 +122,25 @@ describe('getResultTypeDef', () => {
     expect(getResultTypeDef('없는유형')).toBeNull()
   })
 
-  test('유형 정의에는 밈 문구와 강점이 있다', () => {
-    const result = calcQuizResult(answersByIndex(0))!
-    const def = getResultTypeDef(result.resultType)!
-    expect(def.memeLine.length).toBeGreaterThan(0)
-    expect(def.strength.length).toBeGreaterThan(0)
-    expect(def.summary.length).toBeGreaterThan(0)
+  test('유형 리치 프로필 필드가 모두 채워져 있다', () => {
+    RESULT_TYPE_LIST.forEach((def) => {
+      expect(def.memeLine.length).toBeGreaterThan(0)
+      expect(def.summary.length).toBeGreaterThan(50)
+      expect(def.loveStyle.length).toBeGreaterThan(50)
+      expect(def.marriageOutlook.length).toBeGreaterThan(50)
+      expect(def.strengths).toHaveLength(3)
+      expect(def.watchouts.length).toBeGreaterThanOrEqual(2)
+      expect(def.tips).toHaveLength(3)
+      expect(def.keywords.length).toBeGreaterThanOrEqual(3)
+    })
+  })
+
+  test('케미 상대(bestMatch/hardMatch)는 실존하는 유형을 가리킨다', () => {
+    RESULT_TYPE_LIST.forEach((def) => {
+      expect(getResultTypeDef(def.bestMatch)).not.toBeNull()
+      expect(getResultTypeDef(def.hardMatch)).not.toBeNull()
+      expect(def.bestMatch).not.toBe(def.name)
+      expect(def.hardMatch).not.toBe(def.name)
+    })
   })
 })

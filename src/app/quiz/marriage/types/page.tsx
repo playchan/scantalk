@@ -18,7 +18,7 @@ const STYLE_LABELS: Record<string, string> = {
   steady: '지키는 스타일',
 }
 
-// 카피 검수 페이지 — 문항 12개와 유형 6종을 한 화면에서 검토
+// 카피 검수 페이지 — 문항 24개와 유형 6종 리치 프로필을 한 화면에서 검토
 export default function QuizTypesReviewPage() {
   return (
     <main className="min-h-screen bg-gray-50 px-5 py-10">
@@ -39,13 +39,15 @@ export default function QuizTypesReviewPage() {
 
         {/* 유형 6종 */}
         <h2 className="text-base font-bold text-gray-900 mb-3">결과 유형 6종</h2>
-        <div className="space-y-3 mb-10">
+        <div className="space-y-4 mb-10">
           {RESULT_TYPE_LIST.map((type) => {
             const [band, style] = type.key.split('-')
             return (
               <div key={type.key} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-bold text-gray-900">{type.name}</h3>
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h3 className="font-bold text-gray-900">
+                    {type.emoji} {type.name}
+                  </h3>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">
                     확률 {BAND_LABELS[band]}
                   </span>
@@ -54,15 +56,40 @@ export default function QuizTypesReviewPage() {
                   </span>
                 </div>
                 <p className="text-sm text-rose-400 font-semibold mb-2">"{type.memeLine}"</p>
-                <p className="text-sm text-gray-600 leading-relaxed mb-2">{type.summary}</p>
-                <p className="text-xs text-gray-500">💪 강점: {type.strength}</p>
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {type.keywords.map((k) => (
+                    <span key={k} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-400">
+                      #{k}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed mb-3">{type.summary}</p>
+
+                <div className="space-y-2 text-sm">
+                  <p className="text-gray-600 leading-relaxed">
+                    <b className="text-gray-900">💘 연애 스타일</b> — {type.loveStyle}
+                  </p>
+                  <p className="text-gray-600 leading-relaxed">
+                    <b className="text-gray-900">💍 결혼생활</b> — {type.marriageOutlook}
+                  </p>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-gray-50 grid gap-1.5 text-xs text-gray-500">
+                  <p>💪 강점: {type.strengths.join(' · ')}</p>
+                  <p>⚠️ 주의: {type.watchouts.join(' · ')}</p>
+                  <p>🍯 꿀팁: {type.tips.join(' / ')}</p>
+                  <p>
+                    💚 환상의 케미: <b className="text-gray-700">{type.bestMatch}</b> · 🧨 환장의 케미:{' '}
+                    <b className="text-gray-700">{type.hardMatch}</b>
+                  </p>
+                </div>
               </div>
             )
           })}
         </div>
 
-        {/* 문항 12개 */}
-        <h2 className="text-base font-bold text-gray-900 mb-1">문항 12개</h2>
+        {/* 문항 24개 */}
+        <h2 className="text-base font-bold text-gray-900 mb-1">문항 24개 (약 5분)</h2>
         <p className="text-xs text-gray-400 mb-3">
           각 선택지의 배지: 성향 축 · 축 점수 · 확률 기여(p). 구조(축 매핑)는 유지하고 텍스트만 교체 가능.
         </p>
