@@ -23,20 +23,21 @@ function answersByIndex(gender: Gender, optionIndex: number): Answers {
 }
 
 describe('QUESTIONS 구조', () => {
-  test('정의된 문항은 62종이다 (공통 56 + 남녀 전용 각 3)', () => {
-    expect(QUESTIONS).toHaveLength(62)
+  test('정의된 문항은 68종이다 (공통 62 + 남녀 전용 각 3)', () => {
+    expect(QUESTIONS).toHaveLength(68)
   })
 
-  test('남녀 응답 문항 수는 동일하다 (각 59문항)', () => {
-    expect(questionsForGender('male')).toHaveLength(59)
-    expect(questionsForGender('female')).toHaveLength(59)
-    expect(QUESTION_COUNT).toBe(59)
+  test('남녀 응답 문항 수는 동일하다 (각 65문항)', () => {
+    expect(questionsForGender('male')).toHaveLength(65)
+    expect(questionsForGender('female')).toHaveLength(65)
+    expect(QUESTION_COUNT).toBe(65)
   })
 
-  test('모든 문항은 4지선다이고 옵션 id가 전역에서 고유하다', () => {
+  test('모든 문항은 4~5지선다이고 옵션 id가 전역에서 고유하다', () => {
     const ids = new Set<string>()
     QUESTIONS.forEach((q) => {
-      expect(q.options).toHaveLength(4)
+      expect(q.options.length).toBeGreaterThanOrEqual(4)
+      expect(q.options.length).toBeLessThanOrEqual(5)
       q.options.forEach((o) => {
         expect(ids.has(o.id)).toBe(false)
         ids.add(o.id)
