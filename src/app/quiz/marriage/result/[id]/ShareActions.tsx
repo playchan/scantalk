@@ -44,7 +44,7 @@ export default function ShareActions({ resultId }: ShareActionsProps) {
       try {
         await navigator.share({
           title: '내가 결혼할 확률은?',
-          text: '12개 질문, 90초. 너도 해봐 👀',
+          text: '나의 연애 유형과 결혼 확률, 너도 해봐 👀',
           url,
         })
       } catch {
