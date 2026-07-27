@@ -17,6 +17,11 @@
 | `reports` | 분석 리포트 (AI 초안 + 운영자 수정본) |
 | `match_requests` | 매칭 신청 내역 |
 | `products` | 유료 상품 정보 |
+| `quiz_results` | (v2 R1) 바이럴 검사 결과 — 응답·4축 성향·확률·유형 |
+| `preregistrations` | (v2 R1) 매칭 사전신청 (1인 1건) |
+| `events` | (v2 R1) 퍼널 이벤트 — 측정 기준 데이터, service_role 전용 |
+
+> v2 라운드 1 테이블의 상세 정의와 RLS는 [supabase/migrations/20260726_round1_viral_quiz.sql](../supabase/migrations/20260726_round1_viral_quiz.sql)과 [10-v2-mvp-spec.md](10-v2-mvp-spec.md) 6번 참고.
 
 ---
 
