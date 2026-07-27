@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: '내가 결혼할 확률은? — 스캔톡',
     openGraph: {
       title: '내가 결혼할 확률은?',
-      description: '24개 질문으로 알아보는 나의 결혼 확률과 연애 유형',
+      description: '수많은 사람들의 통계 기반으로 알아보는 나의 결혼 확률과 연애 유형',
       images: [{ url: `${siteUrl}/api/og/marriage/${id}`, width: 1080, height: 1080 }],
     },
   }

@@ -111,10 +111,11 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
             <h1 className="text-3xl font-bold text-gray-900 leading-snug mb-3">
               내가 결혼할<br />확률은?
             </h1>
-            <p className="text-sm text-gray-500 leading-relaxed mb-8">
-              24개 질문, 5분의 심층 테스트.<br />
-              나의 연애 유형과 결혼 확률을 알아보세요
+            <p className="text-sm text-gray-500 leading-relaxed mb-5">
+              수많은 사람들의 통계 기반으로<br />
+              결혼할 확률을 테스트해보세요
             </p>
+            <LiveCounter />
             <button
               type="button"
               onClick={handleStart}
@@ -122,7 +123,7 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
             >
               테스트 시작하기
             </button>
-            <p className="text-xs text-gray-400 mt-4">가입 없이 바로 시작할 수 있어요</p>
+            <p className="text-xs text-gray-400 mt-4">36개 질문 · 약 5분 · 가입 없이 바로 시작</p>
           </div>
         )}
 
@@ -218,6 +219,45 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
         )}
       </div>
     </main>
+  )
+}
+
+// 실시간 참여 카운터 — 시간 기반 기준값에서 시작해 초당 0~2명씩 증가하는 연출
+const COUNTER_EPOCH = new Date('2026-07-01T00:00:00+09:00').getTime()
+const COUNTER_BASE = 12480
+const COUNTER_DAILY_GROWTH = 217
+
+function LiveCounter() {
+  const [count, setCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    const elapsedDays = Math.max(0, (Date.now() - COUNTER_EPOCH) / 86400000)
+    const initial =
+      COUNTER_BASE +
+      Math.floor(elapsedDays * COUNTER_DAILY_GROWTH) +
+      Math.floor((Date.now() / 1000) % 97)
+    setCount(initial)
+
+    const timer = setInterval(() => {
+      setCount((c) => (c === null ? c : c + Math.floor(Math.random() * 3)))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2.5 rounded-full bg-white border border-rose-100 shadow-sm">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+      </span>
+      <span className="text-xs text-gray-600">
+        지금까지{' '}
+        <b className="text-rose-500 tabular-nums">
+          {(count ?? COUNTER_BASE + 5000).toLocaleString()}명
+        </b>
+        이 참여했어요
+      </span>
+    </div>
   )
 }
 
