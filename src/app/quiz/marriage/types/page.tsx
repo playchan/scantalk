@@ -1,0 +1,100 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { QUESTIONS, RESULT_TYPE_LIST, AXIS_LABELS } from '@/lib/quiz/marriage'
+
+export const metadata: Metadata = {
+  title: '[검수] 문항·유형 전체 — 스캔톡',
+  robots: { index: false, follow: false },
+}
+
+const BAND_LABELS: Record<string, string> = {
+  high: '높음 (75%+)',
+  mid: '중간 (55~74%)',
+  low: '낮음 (~54%)',
+}
+
+const STYLE_LABELS: Record<string, string> = {
+  approach: '다가가는 스타일',
+  steady: '지키는 스타일',
+}
+
+// 카피 검수 페이지 — 문항 12개와 유형 6종을 한 화면에서 검토
+export default function QuizTypesReviewPage() {
+  return (
+    <main className="min-h-screen bg-gray-50 px-5 py-10">
+      <div className="max-w-[560px] mx-auto">
+        <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 text-xs text-amber-700 font-semibold text-center mb-6">
+          🧪 카피 검수용 페이지 — 문항·유형 텍스트 확인 및 수정 논의용
+        </div>
+
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl font-bold text-gray-900">문항·유형 전체 보기</h1>
+          <Link
+            href="/quiz/marriage/preview"
+            className="text-sm text-rose-500 font-semibold hover:underline"
+          >
+            테스트 해보기 →
+          </Link>
+        </div>
+
+        {/* 유형 6종 */}
+        <h2 className="text-base font-bold text-gray-900 mb-3">결과 유형 6종</h2>
+        <div className="space-y-3 mb-10">
+          {RESULT_TYPE_LIST.map((type) => {
+            const [band, style] = type.key.split('-')
+            return (
+              <div key={type.key} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-bold text-gray-900">{type.name}</h3>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">
+                    확률 {BAND_LABELS[band]}
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                    {STYLE_LABELS[style]}
+                  </span>
+                </div>
+                <p className="text-sm text-rose-400 font-semibold mb-2">"{type.memeLine}"</p>
+                <p className="text-sm text-gray-600 leading-relaxed mb-2">{type.summary}</p>
+                <p className="text-xs text-gray-500">💪 강점: {type.strength}</p>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* 문항 12개 */}
+        <h2 className="text-base font-bold text-gray-900 mb-1">문항 12개</h2>
+        <p className="text-xs text-gray-400 mb-3">
+          각 선택지의 배지: 성향 축 · 축 점수 · 확률 기여(p). 구조(축 매핑)는 유지하고 텍스트만 교체 가능.
+        </p>
+        <div className="space-y-3">
+          {QUESTIONS.map((q, i) => (
+            <div key={q.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h3 className="text-sm font-bold text-gray-900 mb-3">
+                Q{i + 1}. {q.title}
+              </h3>
+              <ul className="space-y-2">
+                {q.options.map((o) => (
+                  <li key={o.id} className="flex items-center justify-between gap-2 text-sm">
+                    <span className="text-gray-700">{o.label}</span>
+                    <span className="flex gap-1 shrink-0">
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
+                        {AXIS_LABELS[o.axis]} +{o.score}
+                      </span>
+                      <span
+                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                          o.p >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'
+                        }`}
+                      >
+                        p {o.p >= 0 ? `+${o.p}` : o.p}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  )
+}

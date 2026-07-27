@@ -2,19 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { QUESTIONS, type Answers } from '@/lib/quiz/marriage'
+import { QUESTIONS, calcQuizResult, AXIS_LABELS, type Answers, type AxisKey } from '@/lib/quiz/marriage'
 import { saveQuizResult, trackQuizComplete } from '@/app/actions/quiz'
 import { trackEvent } from '@/app/actions/tracking'
 
 export const ANSWERS_STORAGE_KEY = 'st_quiz_marriage_answers'
 
-type Stage = 'intro' | 'questions' | 'preview'
+type Stage = 'intro' | 'questions' | 'preview' | 'result'
 
 interface QuizFlowProps {
   isLoggedIn: boolean
+  /** 카피 검수용 테스트 모드 — 가입 없이 결과 표시, 저장·이벤트 집계 없음 */
+  previewMode?: boolean
 }
 
-export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
+export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowProps) {
   const router = useRouter()
   const [stage, setStage] = useState<Stage>('intro')
   const [index, setIndex] = useState(0)
@@ -24,10 +26,11 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
   const viewTracked = useRef(false)
 
   useEffect(() => {
+    if (previewMode) return
     if (viewTracked.current) return
     viewTracked.current = true
     void trackEvent('quiz_view')
-  }, [])
+  }, [previewMode])
 
   const question = QUESTIONS[index]
   const progress = Math.round((index / QUESTIONS.length) * 100)
@@ -35,7 +38,13 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
   function handleStart() {
     setStage('questions')
     setIndex(0)
-    void trackEvent('quiz_start')
+    if (!previewMode) void trackEvent('quiz_start')
+  }
+
+  function handleRetake() {
+    setAnswers({})
+    setIndex(0)
+    setStage('questions')
   }
 
   function handleSelect(optionId: string) {
@@ -44,6 +53,12 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
 
     if (index < QUESTIONS.length - 1) {
       setIndex(index + 1)
+      return
+    }
+
+    // 테스트 모드: 저장·집계 없이 결과를 바로 보여준다 (KPI 오염 방지)
+    if (previewMode) {
+      setStage('result')
       return
     }
 
@@ -83,6 +98,12 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-rose-50 to-white flex flex-col items-center px-5 py-10">
       <div className="w-full max-w-[420px] flex-1 flex flex-col">
+        {previewMode && (
+          <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 text-xs text-amber-700 font-semibold text-center mb-2">
+            🧪 테스트 모드 — 결과가 저장되지 않고 통계에도 잡히지 않습니다
+          </div>
+        )}
+
         {stage === 'intro' && (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
             <span className="text-5xl mb-5">💍</span>
@@ -190,7 +211,72 @@ export default function QuizFlow({ isLoggedIn }: QuizFlowProps) {
             </button>
           </div>
         )}
+
+        {stage === 'result' && previewMode && (
+          <PreviewResult answers={answers} onRetake={handleRetake} />
+        )}
       </div>
     </main>
+  )
+}
+
+// 테스트 모드 전용 결과 화면 — 실서비스 결과 페이지와 동일한 정보를 즉석 표시
+function PreviewResult({ answers, onRetake }: { answers: Answers; onRetake: () => void }) {
+  const result = calcQuizResult(answers)
+  if (!result) return null
+
+  const maxAxisScore = Math.max(...Object.values(result.axes), 1)
+
+  return (
+    <div className="flex-1 flex flex-col justify-center py-6">
+      <div className="text-center mb-6">
+        <p className="text-sm text-gray-500 mb-2">나의 결혼 확률은</p>
+        <p className="text-6xl font-extrabold text-rose-500 mb-2">{result.probability}%</p>
+        <h2 className="text-xl font-bold text-gray-900">{result.resultType}</h2>
+        <p className="text-sm text-rose-400 font-semibold mt-1">"{result.memeLine}"</p>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-3">
+        <p className="text-sm text-gray-600 leading-relaxed mb-3">{result.summary}</p>
+        <p className="text-sm">
+          <span className="text-rose-500 font-semibold">💪 강점</span>{' '}
+          <span className="text-gray-700">{result.strength}</span>
+        </p>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-4">
+        <h3 className="text-sm font-bold text-gray-900 mb-3">성향 축</h3>
+        <div className="space-y-2.5">
+          {(Object.keys(AXIS_LABELS) as AxisKey[]).map((axis) => (
+            <div key={axis} className="flex items-center gap-3">
+              <span className="text-xs text-gray-500 w-16">{AXIS_LABELS[axis]}</span>
+              <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-rose-400 rounded-full"
+                  style={{ width: `${Math.round((result.axes[axis] / maxAxisScore) * 100)}%` }}
+                />
+              </div>
+              <span className="text-xs text-gray-400 w-6 text-right">{result.axes[axis]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={onRetake}
+          className="py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold transition-colors"
+        >
+          다시 하기
+        </button>
+        <a
+          href="/quiz/marriage/types"
+          className="py-3 rounded-xl border border-gray-200 hover:border-rose-200 text-gray-700 text-sm font-bold text-center transition-colors"
+        >
+          전체 문항·유형 보기
+        </a>
+      </div>
+    </div>
   )
 }
