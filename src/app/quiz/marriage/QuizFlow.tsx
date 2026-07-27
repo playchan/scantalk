@@ -222,13 +222,67 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
   )
 }
 
-// 실시간 참여 카운터 — 시간 기반 기준값에서 시작해 초당 0~2명씩 증가하는 연출
+// 실시간 참여 카운터 — 시간 기반 기준값에서 시작해 0.7~1.6초마다 0~2명씩 증가하는 연출
 const COUNTER_EPOCH = new Date('2026-07-01T00:00:00+09:00').getTime()
 const COUNTER_BASE = 12480
 const COUNTER_DAILY_GROWTH = 217
+// 오도미터 자릿수 롤링 높이 (em)
+const DIGIT_EM = 1.35
+
+// 플립 시계처럼 세로로 굴러가는 한 자리 숫자
+function RollingDigit({ digit }: { digit: string }) {
+  const n = Number(digit)
+  return (
+    <span
+      className="inline-block overflow-hidden align-bottom"
+      style={{ height: `${DIGIT_EM}em` }}
+    >
+      <span
+        className="block transition-transform duration-700"
+        style={{
+          transform: `translateY(-${n * DIGIT_EM}em)`,
+          transitionTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)',
+        }}
+      >
+        {Array.from({ length: 10 }, (_, i) => (
+          <span
+            key={i}
+            className="block text-center"
+            style={{ height: `${DIGIT_EM}em`, lineHeight: `${DIGIT_EM}em` }}
+          >
+            {i}
+          </span>
+        ))}
+      </span>
+    </span>
+  )
+}
+
+function RollingNumber({ value, bumping }: { value: number; bumping: boolean }) {
+  const text = value.toLocaleString()
+  return (
+    <span
+      className={`inline-flex items-baseline font-bold tabular-nums transition-all duration-300 ${
+        bumping ? 'scale-110 text-rose-600' : 'scale-100 text-rose-500'
+      }`}
+      style={{ transformOrigin: 'center bottom' }}
+    >
+      {text.split('').map((ch, i) =>
+        /\d/.test(ch) ? (
+          <RollingDigit key={`${text.length}-${i}`} digit={ch} />
+        ) : (
+          <span key={`${text.length}-${i}`} style={{ lineHeight: `${DIGIT_EM}em` }}>
+            {ch}
+          </span>
+        ),
+      )}
+    </span>
+  )
+}
 
 function LiveCounter() {
   const [count, setCount] = useState<number | null>(null)
+  const [bumping, setBumping] = useState(false)
 
   useEffect(() => {
     const elapsedDays = Math.max(0, (Date.now() - COUNTER_EPOCH) / 86400000)
@@ -238,10 +292,26 @@ function LiveCounter() {
       Math.floor((Date.now() / 1000) % 97)
     setCount(initial)
 
-    const timer = setInterval(() => {
-      setCount((c) => (c === null ? c : c + Math.floor(Math.random() * 3)))
-    }, 1000)
-    return () => clearInterval(timer)
+    let tickTimer: ReturnType<typeof setTimeout>
+    let bumpTimer: ReturnType<typeof setTimeout>
+
+    const tick = () => {
+      tickTimer = setTimeout(() => {
+        const increment = Math.floor(Math.random() * 3)
+        if (increment > 0) {
+          setCount((c) => (c === null ? c : c + increment))
+          setBumping(true)
+          bumpTimer = setTimeout(() => setBumping(false), 450)
+        }
+        tick()
+      }, 700 + Math.random() * 900)
+    }
+    tick()
+
+    return () => {
+      clearTimeout(tickTimer)
+      clearTimeout(bumpTimer)
+    }
   }, [])
 
   return (
@@ -250,12 +320,9 @@ function LiveCounter() {
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
         <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
       </span>
-      <span className="text-xs text-gray-600">
-        지금까지{' '}
-        <b className="text-rose-500 tabular-nums">
-          {(count ?? COUNTER_BASE + 5000).toLocaleString()}명
-        </b>
-        이 참여했어요
+      <span className="text-xs text-gray-600 inline-flex items-baseline gap-0.5">
+        지금까지 <RollingNumber value={count ?? COUNTER_BASE + 5000} bumping={bumping} />명이
+        참여했어요
       </span>
     </div>
   )
