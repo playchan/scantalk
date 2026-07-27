@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { QUESTIONS, RESULT_TYPE_LIST, AXIS_LABELS } from '@/lib/quiz/marriage'
+import { QUESTIONS, RESULT_TYPE_LIST, AXIS_LABELS, CATEGORY_LABELS } from '@/lib/quiz/marriage'
 
 export const metadata: Metadata = {
   title: '[검수] 문항·유형 전체 — 스캔톡',
@@ -13,9 +13,11 @@ const BAND_LABELS: Record<string, string> = {
   low: '낮음 (~54%)',
 }
 
-const STYLE_LABELS: Record<string, string> = {
-  approach: '다가가는 스타일',
-  steady: '지키는 스타일',
+const DOMINANT_LABELS: Record<string, string> = {
+  expression: '표현 주도형',
+  pace: '속도 주도형',
+  stability: '안정 주도형',
+  independence: '독립 주도형',
 }
 
 // 카피 검수 페이지 — 문항 24개와 유형 6종 리치 프로필을 한 화면에서 검토
@@ -37,11 +39,11 @@ export default function QuizTypesReviewPage() {
           </Link>
         </div>
 
-        {/* 유형 6종 */}
-        <h2 className="text-base font-bold text-gray-900 mb-3">결과 유형 6종</h2>
+        {/* 유형 12종 */}
+        <h2 className="text-base font-bold text-gray-900 mb-3">결과 유형 12종</h2>
         <div className="space-y-4 mb-10">
           {RESULT_TYPE_LIST.map((type) => {
-            const [band, style] = type.key.split('-')
+            const [band, dominant] = type.key.split('-')
             return (
               <div key={type.key} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -52,7 +54,7 @@ export default function QuizTypesReviewPage() {
                     확률 {BAND_LABELS[band]}
                   </span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
-                    {STYLE_LABELS[style]}
+                    {DOMINANT_LABELS[dominant]}
                   </span>
                 </div>
                 <p className="text-sm text-rose-400 font-semibold mb-2">"{type.memeLine}"</p>
@@ -88,17 +90,21 @@ export default function QuizTypesReviewPage() {
           })}
         </div>
 
-        {/* 문항 24개 */}
-        <h2 className="text-base font-bold text-gray-900 mb-1">문항 24개 (약 5분)</h2>
+        {/* 문항 36개 */}
+        <h2 className="text-base font-bold text-gray-900 mb-1">문항 36개 (약 5분)</h2>
         <p className="text-xs text-gray-400 mb-3">
-          각 선택지의 배지: 성향 축 · 축 점수 · 확률 기여(p). 구조(축 매핑)는 유지하고 텍스트만 교체 가능.
+          카테고리: 프로필·취향은 AI봇 프로필 재료(축 영향 없음), 성격·상황은 성향 축 산출.
+          구조(카테고리·축 매핑)는 유지하고 텍스트만 교체 가능.
         </p>
         <div className="space-y-3">
           {QUESTIONS.map((q, i) => (
             <div key={q.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <h3 className="text-sm font-bold text-gray-900 mb-3">
+              <h3 className="text-sm font-bold text-gray-900 mb-1">
                 Q{i + 1}. {q.title}
               </h3>
+              <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-500 mb-3">
+                {CATEGORY_LABELS[q.category]}
+              </span>
               <ul className="space-y-2">
                 {q.options.map((o) => (
                   <li key={o.id} className="flex items-center justify-between gap-2 text-sm">

@@ -17,8 +17,14 @@ function answersByIndex(optionIndex: number): Answers {
 }
 
 describe('QUESTIONS 구조', () => {
-  test('문항은 정확히 24개다 (약 5분 분량)', () => {
-    expect(QUESTIONS).toHaveLength(24)
+  test('문항은 정확히 36개다 (약 5분 분량)', () => {
+    expect(QUESTIONS).toHaveLength(36)
+  })
+
+  test('모든 문항에 카테고리가 지정되어 있다', () => {
+    QUESTIONS.forEach((q) => {
+      expect(['profile', 'personality', 'preference', 'situation']).toContain(q.category)
+    })
   })
 
   test('모든 문항은 4지선다이고 옵션 id가 전역에서 고유하다', () => {
@@ -120,6 +126,10 @@ describe('calcQuizResult', () => {
 describe('getResultTypeDef', () => {
   test('존재하지 않는 유형이면 null', () => {
     expect(getResultTypeDef('없는유형')).toBeNull()
+  })
+
+  test('유형은 12종이다 (확률 3구간 × 주도 축 4개)', () => {
+    expect(RESULT_TYPE_LIST).toHaveLength(12)
   })
 
   test('유형 리치 프로필 필드가 모두 채워져 있다', () => {
