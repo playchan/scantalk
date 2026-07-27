@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>ScanTalk IR Deck</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #17141b; --ink2: #211d29; --line-d: #37313f;
+    --ivory: #faf7f2; --paper: #ffffff; --line: #e8e1d5;
+    --rose: #e0475a; --rose2: #ff8a94; --rose-bg: #fdecee;
+    --gold: #e0932c; --mut: #8d8779; --mut-d: #a49dae;
+  }
+  html, body { font-family: 'Pretendard Variable', Pretendard, 'Malgun Gothic', sans-serif; color: var(--ink); }
+
+  .slide {
+    width: 13.333in; height: 7.5in;
+    page-break-after: always; position: relative; overflow: hidden;
+    padding: 0.66in 0.85in 0.72in;
+    background: var(--ivory);
+    display: flex; flex-direction: column;
+  }
+  .slide.dark { background: var(--ink); color: #f6f2eb; }
+  .slide.dark::before { content:""; position:absolute; inset:0;
+    background: radial-gradient(900px 500px at 88% -10%, rgba(224,71,90,.16), transparent 60%),
+                radial-gradient(700px 420px at -5% 110%, rgba(224,147,44,.07), transparent 60%); }
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ghost number */
+  .ghost { position:absolute; right:0.45in; bottom:-0.28in; font-size:190px; font-weight:800; letter-spacing:-6px;
+    color:transparent; -webkit-text-stroke: 1.5px rgba(23,20,27,.08); z-index:0; }
+  .dark .ghost { -webkit-text-stroke: 1.5px rgba(246,242,235,.09); }
+
+  /* header & footer */
+  .head { display:flex; align-items:baseline; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:8px; }
+  .dark .head { border-color: var(--line-d); }
+  .eyebrow { font-size:12.5px; font-weight:800; letter-spacing:3.5px; color:var(--rose); text-transform:uppercase; }
+  .dark .eyebrow { color: var(--rose2); }
+  .head .brand { font-size:11px; font-weight:700; letter-spacing:2.5px; color:#c3bcae; }
+  .dark .head .brand { color:#5c5568; }
+  h2 { font-size:36px; font-weight:800; line-height:1.22; letter-spacing:-1px; margin:14px 0 6px; }
+  .sub { font-size:15px; color:var(--mut); margin-bottom:4px; }
+  .dark .sub { color: var(--mut-d); }
+  .foot { position:absolute; bottom:0.3in; left:0.85in; right:0.85in; display:flex; justify-content:space-between; font-size:10.5px; letter-spacing:1.5px; color:#c3bcae; z-index:1; }
+  .dark .foot { color:#5c5568; }
+
+  h3 { font-size:16.5px; font-weight:800; margin-bottom:6px; letter-spacing:-0.2px; }
+  p, li, td, th { font-size:14px; line-height:1.6; }
+  .muted { color:var(--mut); } .dark .muted { color:var(--mut-d); }
+  .accent { color:var(--rose); } .dark .accent { color:var(--rose2); }
+
+  .grow { flex:1; display:flex; flex-direction:column; justify-content:center; }
+  .cols { display:flex; gap:24px; } .col { flex:1; }
+
+  .card { background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:20px 22px;
+    box-shadow: 0 1px 0 rgba(23,20,27,.03); }
+  .dark .card { background:var(--ink2); border-color:var(--line-d); box-shadow:none; }
+  .card.hero { border-top:4px solid var(--rose); }
+  .band { border-radius:16px; padding:18px 26px; background:var(--ink); color:#f6f2eb; }
+  .band b { color:var(--rose2); }
+
+  table { border-collapse:collapse; width:100%; }
+  th { text-align:left; font-size:11.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--mut); padding:9px 14px; border-bottom:2px solid var(--rose); }
+  td { padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+
+  .tag { display:inline-block; font-size:11px; font-weight:800; padding:4px 12px; border-radius:20px; background:var(--rose-bg); color:#c23540; margin-right:6px; letter-spacing:0.5px; }
+  .dark .tag { background:rgba(224,71,90,.16); color:var(--rose2); }
+
+  /* funnel steps */
+  .flow { display:flex; gap:0; align-items:stretch; }
+  .flow .step { flex:1; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px 15px 14px; position:relative; }
+  .flow .arrow { align-self:center; padding:0 7px; color:var(--rose); font-size:19px; font-weight:800; }
+  .step .n { display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:1.5px; color:#fff; background:linear-gradient(135deg,var(--rose),var(--rose2)); border-radius:16px; padding:2px 10px; margin-bottom:8px; }
+  .step b { font-size:14.5px; display:block; margin-bottom:4px; letter-spacing:-0.2px; }
+  .step span { font-size:12px; color:var(--mut); line-height:1.5; display:block; }
+  .step.last { background:var(--rose-bg); border-color:#f3c2c8; }
+
+  /* bars */
+  .bar-row { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .bar-label { width:148px; font-size:13.5px; font-weight:700; }
+  .bar-track { flex:1; height:30px; background:#efe9de; border-radius:8px; overflow:hidden; position:relative; }
+  .dark .bar-track { background:#2c2735; }
+  .bar-fill { height:100%; background:linear-gradient(90deg,var(--rose),var(--rose2)); border-radius:8px; display:flex; align-items:center; justify-content:flex-end; padding-right:10px; color:#fff; font-size:12px; font-weight:800; }
+  .bar-val { width:118px; font-size:13px; font-weight:700; color:#5c574a; }
+  .dark .bar-val { color:var(--mut-d); }
+
+  /* timeline */
+  .rail { position:relative; margin:6px 0 18px; height:4px; background:linear-gradient(90deg,var(--rose),var(--gold),var(--rose)); border-radius:2px; opacity:.35; }
+  .timeline { display:flex; gap:12px; }
+  .phase { flex:1; border-radius:14px; padding:15px 15px 13px; background:var(--paper); border:1px solid var(--line); border-top:4px solid var(--rose); }
+  .phase.alt { border-top-color:var(--gold); }
+  .phase .ph-round { font-size:11px; font-weight:800; letter-spacing:1.5px; color:var(--rose); }
+  .phase.alt .ph-round { color:#b97a1a; }
+  .phase .ph-week { font-size:10.5px; color:var(--mut); float:right; font-weight:700; }
+  .phase b { display:block; font-size:14.5px; margin:6px 0 5px; letter-spacing:-0.2px; }
+  .phase p { font-size:11.5px; line-height:1.5; color:#5c574a; }
+  .phase .gate { margin-top:9px; font-size:10.5px; color:#c23540; font-weight:800; background:var(--rose-bg); border-radius:8px; padding:5px 8px; line-height:1.4; }
+
+  .placeholder { border:1.5px dashed #cf9aa2; border-radius:14px; padding:16px 20px; background:#fdf7f8; color:#a8404d; font-size:13.5px; font-weight:700; line-height:1.65; }
+  .dark .placeholder { background:rgba(224,71,90,.08); border-color:rgba(255,138,148,.5); color:#f0aab1; }
+
+  .big-quote { font-weight:800; line-height:1.42; letter-spacing:-0.8px; }
+  .checklist li { list-style:none; padding-left:30px; position:relative; margin-bottom:13px; }
+  .checklist li::before { content:"✓"; position:absolute; left:0; top:1px; width:19px; height:19px; border-radius:50%;
+    background:linear-gradient(135deg,var(--rose),var(--rose2)); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+
+  /* ---------- phone mock ---------- */
+  .phone { width:3.05in; background:#211d29; border:1px solid #3d3748; border-radius:26px; padding:16px 15px 18px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.45); }
+  .phone .ph-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .phone .ph-title { font-size:13px; font-weight:800; color:#f6f2eb; letter-spacing:-0.2px; }
+  .phone .ph-tabs { display:flex; gap:6px; }
+  .phone .ph-tab { font-size:9.5px; font-weight:800; padding:3px 9px; border-radius:12px; background:#302a3b; color:#9d97a8; }
+  .phone .ph-tab.on { background:linear-gradient(135deg,var(--rose),var(--rose2)); color:#fff; }
+  .rowitem { display:flex; align-items:center; gap:10px; background:#2a2535; border-radius:13px; padding:9px 11px; margin-bottom:8px; }
+  .avatar { width:26px; height:26px; border-radius:50%; flex:none; font-size:12px; display:flex; align-items:center; justify-content:center; background:#3d3748; }
+  .rowitem .nm { font-size:11.5px; font-weight:700; color:#e8e3da; }
+  .rowitem .st { font-size:9px; color:#8d8798; }
+  .aff { margin-left:auto; text-align:right; }
+  .aff b { font-size:13px; color:var(--rose2); display:block; line-height:1.1; }
+  .aff i { font-style:normal; font-size:8.5px; color:#8d8798; }
+  .minibar { height:4px; border-radius:2px; background:#3d3748; margin-top:3px; width:52px; overflow:hidden; }
+  .minibar div { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--rose),var(--rose2)); }
+  .ph-note { margin-top:10px; border:1px dashed #4a4356; border-radius:11px; padding:8px 10px; font-size:9.5px; color:#9d97a8; line-height:1.5; text-align:center; }
+  .ph-note b { color:var(--rose2); }
+
+  /* chat bubbles (blurred secrecy) */
+  .bub { max-width:78%; border-radius:14px; padding:8px 12px; font-size:10.5px; line-height:1.5; margin-bottom:8px; color:#ddd6cc; }
+  .bub.me { background:linear-gradient(135deg,var(--rose),#d13c4f); color:#fff; margin-left:auto; border-bottom-right-radius:4px; }
+  .bub.yo { background:#312b3d; border-bottom-left-radius:4px; }
+  .bub.hid { filter: blur(3.5px); opacity:.75; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="slide dark">
+  <div class="grow">
+    <div class="cols" style="align-items:center;">
+      <div class="col" style="flex:1.25;">
+        <div class="eyebrow" style="margin-bottom:16px;">Investor Relations · 2026.07</div>
+        <h1 style="font-size:78px; font-weight:800; letter-spacing:-2.5px; line-height:1.05; margin-bottom:28px;">
+          스캔톡<br>
+          <span style="color:var(--rose2);">ScanTalk</span>
+        </h1>
+        <p class="big-quote" style="font-size:26px; max-width:6.6in; color:#e8e3da;">재미로 해본 무료 검사가 나의 AI봇이 되고,<br>그 AI봇이 <span class="accent">나 대신 소개팅</span>을 뛰는 서비스</p>
+        <div style="margin-top:38px;">
+          <span class="tag">AI 매칭</span><span class="tag">바이럴 콘텐츠</span><span class="tag">익명 소셜</span>
+        </div>
+      </div>
+      <div class="col" style="flex:0.9; display:flex; justify-content:center;">
+        <div class="phone" style="transform:rotate(3deg);">
+          <div class="ph-head">
+            <span class="ph-title">스캔톡</span>
+            <span class="ph-tabs"><span class="ph-tab">챗</span><span class="ph-tab on">나의 AI</span></span>
+          </div>
+          <div class="rowitem"><span class="avatar">🌙</span><span><span class="nm">달빛여우</span><br><span class="st">봇 대화 진행 중</span></span><span class="aff"><b>82%</b><span class="minibar"><div style="width:82%"></div></span></span></div>
+          <div class="rowitem" style="outline:1.5px solid rgba(255,138,148,.6);"><span class="avatar">🍑</span><span><span class="nm">복숭아안개</span><br><span class="st" style="color:var(--rose2);">임계치 도달!</span></span><span class="aff"><b>76%</b><span class="minibar"><div style="width:76%"></div></span></span></div>
+          <div class="rowitem"><span class="avatar">🌊</span><span><span class="nm">새벽바다</span><br><span class="st">봇 대화 진행 중</span></span><span class="aff"><b>61%</b><span class="minibar"><div style="width:61%"></div></span></span></div>
+          <div class="ph-note"><b>"실제 사람과 대화하시겠습니까?"</b><br>대화 내용은 비공개 · 호감도 %만 보입니다</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>SCANTALK · CONFIDENTIAL</span><span></span></div>
+</section>
+
+<!-- 2. PROBLEM -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Problem</span><span class="brand">SCANTALK</span></div>
+  <h2>데이팅 앱은 왜 피로한가</h2>
+  <p class="sub">매칭 이후의 모든 노동이 사용자 몫으로 남아 있다</p>
+  <div class="grow">
+    <div class="cols">
+      <div class="col card hero">
+        <div style="font-size:34px; font-weight:800; letter-spacing:-1px; color:var(--rose); margin-bottom:8px;">첫 대화</div>
+        <h3>시작의 부담</h3>
+        <p class="muted" style="font-size:13.5px;">매칭이 되어도 "뭐라고 말을 걸지"부터 막힌다. 대화 시작 자체가 노동이 된 시장.</p>
+      </div>
+      <div class="col card hero">
+        <div style="font-size:34px; font-weight:800; letter-spacing:-1px; color:var(--rose); margin-bottom:8px;">거절</div>
+        <h3>반복되는 상처</h3>
+        <p class="muted" style="font-size:13.5px;">읽씹·언매칭이 그대로 노출된다. 거절 경험이 쌓일수록 조용히 이탈한다.</p>
+      </div>
+      <div class="col card hero">
+        <div style="font-size:34px; font-weight:800; letter-spacing:-1px; color:var(--rose); margin-bottom:8px;">노력↑ 성사↓</div>
+        <h3>낮은 효율</h3>
+        <p class="muted" style="font-size:13.5px;">수십 명에게 같은 인사를 보내는 구조. 들인 시간 대비 실제 만남 전환이 낮다.</p>
+      </div>
+    </div>
+    <div class="band" style="margin-top:24px;">
+      <p style="font-size:16.5px; font-weight:700;">기존 데이팅 앱은 <b>"사람이 직접 뛰는"</b> 구조라서 생기는 마찰을 해결하지 못했다.</p>
+    </div>
+  </div>
+  <div class="ghost">01</div>
+  <div class="foot"><span>SCANTALK</span><span>02</span></div>
+</section>
+
+<!-- 3. SOLUTION -->
+<section class="slide dark">
+  <div class="head"><span class="eyebrow">Solution</span><span class="brand">SCANTALK</span></div>
+  <h2>내 AI봇이 나 대신 뛴다</h2>
+  <p class="sub">첫 대화의 부담도, 거절의 상처도 봇이 대신 겪는다</p>
+  <div class="grow">
+    <div class="cols" style="align-items:center;">
+      <div class="col" style="flex:1.15;">
+        <ul class="checklist">
+          <li style="font-size:16px;"><b>검사 한 번 = 나의 AI봇 생성.</b><br><span class="muted" style="font-size:13.5px;">무료 검사 응답이 그대로 봇의 성격·말투·연애 성향이 된다.</span></li>
+          <li style="font-size:16px;"><b>봇이 자동으로 대화한다.</b><br><span class="muted" style="font-size:13.5px;">궁합이 맞을 것 같은 상대와 알아서 대화 — 게임의 '자동사냥'처럼.</span></li>
+          <li style="font-size:16px;"><b>대화 내용은 절대 비공개.</b><br><span class="muted" style="font-size:13.5px;">나는 상대별 호감도 %만 본다. "내 봇이 뭐라고 했을까"라는 궁금증이 곧 재미.</span></li>
+          <li style="font-size:16px;"><b>거절 경험이 구조적으로 없다.</b><br><span class="muted" style="font-size:13.5px;">양쪽 모두 수락해야만 실제 대화가 열린다. 한쪽만 수락하면 상대는 모른다.</span></li>
+        </ul>
+      </div>
+      <div class="col" style="flex:0.8; display:flex; justify-content:center;">
+        <div class="phone" style="transform:rotate(-2deg);">
+          <div class="ph-head">
+            <span class="ph-title">🤖 봇끼리 대화 중</span>
+            <span class="ph-tabs"><span class="ph-tab on">비공개</span></span>
+          </div>
+          <div class="bub yo hid">주말엔 주로 뭐 하면서 보내세요? 저는 요즘</div>
+          <div class="bub me hid">저는 한강에서 러닝하는 걸 좋아해요 ㅎㅎ</div>
+          <div class="bub yo hid">오 저도 운동 좋아하는데! 혹시 같이</div>
+          <div class="bub me hid">그럼 다음에 기회 되면 한번</div>
+          <div class="ph-note" style="margin-top:14px;">이 대화는 <b>당신에게 보이지 않습니다</b><br>지금 호감도 <b>76%</b> — 오르는 중 ↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">02</div>
+  <div class="foot"><span>SCANTALK</span><span>03</span></div>
+</section>
+
+<!-- 4. PRODUCT / FUNNEL -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Product</span><span class="brand">SCANTALK</span></div>
+  <h2>무료 콘텐츠에서 결제까지, 5단계 퍼널</h2>
+  <p class="sub">획득 → 전환 → 활성화 → 매칭 → 수익화가 한 제품 안에서 끝난다</p>
+  <div class="grow">
+    <div class="flow">
+      <div class="step"><span class="n">1 · 유입</span><b>바이럴 무료 검사</b><span>"내가 결혼할 확률은?" — MBTI처럼 공유되며 퍼지는 검사</span></div>
+      <div class="arrow">›</div>
+      <div class="step"><span class="n">2 · 전환</span><b>AI봇 생성</b><span>검사 완료 = 나의 봇 탄생. 결과 직전 간편 가입</span></div>
+      <div class="arrow">›</div>
+      <div class="step"><span class="n">3 · 활성화</span><b>익명 봇 대화</b><span>봇이 궁합 상대와 자동 대화. 내용 비공개, 호감도 %만</span></div>
+      <div class="arrow">›</div>
+      <div class="step"><span class="n">4 · 매칭</span><b>양측 수락</b><span>임계치 도달 → 둘 다 수락 시에만 실제 채팅 오픈</span></div>
+      <div class="arrow">›</div>
+      <div class="step last"><span class="n">5 · 수익화</span><b>매칭 오픈권 결제</b><span>+ 구독 · 부스터 · 카톡 분석 크로스셀</span></div>
+    </div>
+    <div class="cols" style="margin-top:24px;">
+      <div class="col card">
+        <h3>왜 이 퍼널이 강한가</h3>
+        <p class="muted" style="font-size:13.5px;">획득 비용이 콘텐츠 제작비뿐이다. 검사 결과 공유가 곧 광고이고, 검사 데이터가 곧 제품(봇)이 된다. <b style="color:var(--ink);">CAC를 콘텐츠가 대체하는 구조.</b></p>
+      </div>
+      <div class="col card">
+        <h3>결제 타이밍</h3>
+        <p class="muted" style="font-size:13.5px;">"진짜 사람과 이어지는 순간"에만 지갑을 연다. 첫 매칭 무료 → 두 번째부터 과금. <b style="color:var(--ink);">가치를 체감한 뒤에 결제가 온다.</b></p>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">03</div>
+  <div class="foot"><span>SCANTALK</span><span>04</span></div>
+</section>
+
+<!-- 5. MARKET -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Market</span><span class="brand">SCANTALK</span></div>
+  <h2>시장: 가정을 명시한 상향식 추정</h2>
+  <p class="sub">부풀린 숫자 대신, 라운드 1 실측으로 확정하는 시장 논리</p>
+  <div class="grow">
+    <div class="cols" style="align-items:stretch;">
+      <div class="col" style="flex:1.15;">
+        <div class="bar-row"><div class="bar-label">TAM</div><div class="bar-track"><div class="bar-fill" style="width:100%;">국내 데이팅 서비스 시장</div></div></div>
+        <div class="bar-row"><div class="bar-label">SAM</div><div class="bar-track"><div class="bar-fill" style="width:56%;">20–30대 온라인 데이팅 이용층</div></div></div>
+        <div class="bar-row"><div class="bar-label">SOM · 1년차</div><div class="bar-track"><div class="bar-fill" style="width:16%;"></div></div><div class="bar-val" style="width:auto;">심리테스트 향유층 첫 침투</div></div>
+        <div class="card" style="margin-top:16px;">
+          <h3>추정에 사용한 가정 <span class="muted" style="font-weight:600; font-size:12px;">(검증 예정)</span></h3>
+          <p class="muted" style="font-size:12.5px; line-height:1.7;">· 국내 20–39세 미혼 인구 수백만 명 규모 (통계청 인구총조사 기반)<br>· 이 중 온라인 데이팅/소개팅 서비스 이용 경험층을 SAM으로 설정<br>· SOM은 라운드 1 바이럴 검사 유입 실측치로 역산해 확정<br>· <b style="color:#c23540;">정확한 수치는 실측 후 업데이트 — 부풀린 시장 숫자를 넣지 않는 것이 원칙</b></p>
+        </div>
+      </div>
+      <div class="col" style="flex:0.85;">
+        <div class="card hero" style="height:100%;">
+          <h3 style="font-size:18px;">왜 지금인가 <span class="accent">Why Now</span></h3>
+          <ul class="checklist" style="margin-top:14px;">
+            <li><b>LLM 비용 급락</b><br><span class="muted" style="font-size:12.5px;">개인화 봇 대화의 단가가 처음으로 상업성 구간에 진입</span></li>
+            <li><b>심리테스트의 검증된 바이럴</b><br><span class="muted" style="font-size:12.5px;">MBTI, 퍼스널컬러 — 반복적으로 증명된 확산 공식</span></li>
+            <li><b>데이팅 앱 피로감 확산</b><br><span class="muted" style="font-size:12.5px;">"직접 뛰지 않는" 대안에 대한 수요</span></li>
+            <li><b>익명 소셜의 재부상</b><br><span class="muted" style="font-size:12.5px;">부담 없는 연결이 트렌드</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">04</div>
+  <div class="foot"><span>SCANTALK</span><span>05</span></div>
+</section>
+
+<!-- 6. BUSINESS MODEL -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Business Model</span><span class="brand">SCANTALK</span></div>
+  <h2>수익원 4개 — 가치를 체감한 순간에 과금</h2>
+  <p class="sub">핵심은 매칭 오픈권, 기존 카톡 분석 상품이 두 번째 엔진</p>
+  <div class="grow">
+    <div class="card" style="padding:8px 6px;">
+      <table>
+        <tr><th style="width:1.85in;">수익원</th><th>내용</th><th style="width:1.75in;">가격</th><th style="width:1.35in;">시점</th></tr>
+        <tr><td><b>매칭 오픈권</b> <span class="tag" style="font-size:9.5px; padding:2px 8px;">핵심</span></td><td>호감도 임계치 도달 후 실제 대화방 오픈. 첫 매칭 무료 → 2번째부터 과금</td><td><b>건당 4,900~9,900원</b></td><td>라운드 4</td></tr>
+        <tr><td><b>프리미엄 구독</b></td><td>봇 동시 대화 슬롯 확대, 호감도 상세 그래프, 우선 매칭</td><td><b>월 9,900원</b></td><td>라운드 4 이후</td></tr>
+        <tr><td><b>부스터</b></td><td>내 봇이 더 많은 상대에게 먼저 말 걸기</td><td>건당 소액</td><td>라운드 4 이후</td></tr>
+        <tr><td><b>카톡 분석 크로스셀</b></td><td>매칭 후 실제 대화 시작 유저에게 기존 분석 상품 노출 — "이 대화, 잘 되고 있을까요?"</td><td><b>9,900 / 29,000 / 99,000원</b></td><td>즉시 (기제품)</td></tr>
+      </table>
+    </div>
+    <div class="cols" style="margin-top:20px;">
+      <div class="col card">
+        <h3>원가 구조</h3>
+        <p class="muted" style="font-size:13px;">주 원가는 AI API — 기존 분석 상품 기준 건당 100~1,000원 수준으로 마진율이 높다. 봇 대화는 턴 수·상대 수 상한과 일일 비용 캡으로 통제.</p>
+      </div>
+      <div class="col card">
+        <h3>기존 제품이 곧 두 번째 수익원</h3>
+        <p class="muted" style="font-size:13px;">카톡 분석 MVP는 개발 완료 상태. v2 매칭이 분석 상품의 신규 고객 파이프라인이 되는 이중 구조.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">05</div>
+  <div class="foot"><span>SCANTALK</span><span>06</span></div>
+</section>
+
+<!-- 7. GTM -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Go-to-Market</span><span class="brand">SCANTALK</span></div>
+  <h2>콘텐츠가 광고를 대체한다</h2>
+  <p class="sub">광고비 0원으로 시작하는 바이럴 검사 엔진 — 그리고 숫자로 먼저 정한 통과 기준</p>
+  <div class="grow">
+    <div class="cols">
+      <div class="col">
+        <h3 style="margin-bottom:12px;">바이럴 검사 엔진 — <span class="accent">"내가 결혼할 확률은?"</span></h3>
+        <div class="flow" style="flex-direction:column; gap:10px;">
+          <div class="step"><b>공유되는 결과 카드</b><span>확률 % + 유형 이름 + 밈이 될 한 줄. 인스타 스토리/카톡 공유 최적화</span></div>
+          <div class="step"><b>결과 직전 간편 가입</b><span>리드 확보 지점을 결과 공개 직전 한 곳에만 배치</span></div>
+          <div class="step"><b>CTA 단 하나</b><span>"나와 어울리는 사람과 채팅하기" → 매칭 서비스로 자연 연결</span></div>
+        </div>
+        <p class="muted" style="margin-top:12px; font-size:12.5px;">초기 채널: 인스타 릴스 · 커뮤니티(에브리타임, 블라인드) 수동 시딩. 광고비 없이 오가닉 반응 먼저 검증.</p>
+      </div>
+      <div class="col">
+        <h3 style="margin-bottom:14px;">퍼널 KPI — 통과 기준을 먼저 정했다</h3>
+        <div class="bar-row"><div class="bar-label">방문 → 시작</div><div class="bar-track"><div class="bar-fill" style="width:60%;">60%+</div></div></div>
+        <div class="bar-row"><div class="bar-label">시작 → 완료</div><div class="bar-track"><div class="bar-fill" style="width:70%;">70%+</div></div></div>
+        <div class="bar-row"><div class="bar-label">완료 → 가입</div><div class="bar-track"><div class="bar-fill" style="width:30%;">30%+</div></div></div>
+        <div class="bar-row"><div class="bar-label">가입 → 사전신청</div><div class="bar-track"><div class="bar-fill" style="width:30%;">30%+</div></div></div>
+        <div class="bar-row"><div class="bar-label">완료자 공유율</div><div class="bar-track"><div class="bar-fill" style="width:20%;">20%+</div></div></div>
+        <div class="card" style="margin-top:14px;">
+          <p style="font-size:12.5px;"><b>측정 인프라도 제품의 일부.</b> <span class="muted">자체 이벤트 DB(기준 데이터) + GA4(채널) + PostHog(퍼널·리코딩) + 관리자 인사이트 대시보드를 라운드 1부터 가동.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">06</div>
+  <div class="foot"><span>SCANTALK</span><span>07</span></div>
+</section>
+
+<!-- 8. ROADMAP -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Execution</span><span class="brand">SCANTALK</span></div>
+  <h2>라운드제 실행 — 한 라운드, 하나의 검증 질문</h2>
+  <p class="sub">게이트를 통과해야만 다음 라운드로 — 자본 효율을 지키는 장치</p>
+  <div class="grow">
+    <div class="rail"></div>
+    <div class="timeline">
+      <div class="phase"><span class="ph-round">R0</span><span class="ph-week">~1주</span><b>배포 준비</b><p>빌드 정상화 완료. Vercel 배포, 기존 카톡 분석 유료 테스트 병행</p><div class="gate">✓ 서비스 가동</div></div>
+      <div class="phase alt"><span class="ph-round">R1</span><span class="ph-week">2~3주</span><b>바이럴 검사 + 리드</b><p>POC → 콘텐츠 → 유입 KPI → 인입 KPI 4단계. 방문 1,000명 실측</p><div class="gate">GATE · 유효 채널 1곳 + 퍼널 4단계 통과</div></div>
+      <div class="phase"><span class="ph-round">R2</span><span class="ph-week">3~4주</span><b>AI봇 대화</b><p>검사 → 봇 생성, 유저↔상대 봇 익명 채팅, 호감도 v1</p><div class="gate">GATE · 첫 대화 50% / 10턴 지속 40%</div></div>
+      <div class="phase alt"><span class="ph-round">R3</span><span class="ph-week">3~4주</span><b>자동사냥</b><p>봇↔봇 배치 대화, 나의 AI 탭, 알림. 일일 AI 비용 상한 운영</p><div class="gate">GATE · 주3회 재방문 30%</div></div>
+      <div class="phase"><span class="ph-round">R4</span><span class="ph-week">2~3주</span><b>매칭 + 첫 결제</b><p>양측 수락 매칭, 매칭 오픈권 판매, 성인 인증, 신고/차단</p><div class="gate">GATE · 수락률 40% / 결제 전환 15%</div></div>
+    </div>
+    <div class="cols" style="margin-top:22px;">
+      <div class="col card">
+        <p style="font-size:13px;"><b>총 소요 약 3~4개월.</b> <span class="muted">게이트 미통과 시 다음 라운드로 넘어가지 않고 해당 단계만 수정 후 재측정.</span></p>
+      </div>
+      <div class="col card" style="border-top:4px solid var(--rose);">
+        <p style="font-size:13px;"><b>현재 위치: R0 진행 중.</b> <span class="muted">카톡 분석 MVP(회원/결제/관리자/AI 리포트) 개발 완료, v2 기획 확정.</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">07</div>
+  <div class="foot"><span>SCANTALK</span><span>08</span></div>
+</section>
+
+<!-- 9. COMPETITION -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Differentiation</span><span class="brand">SCANTALK</span></div>
+  <h2>경쟁 구도에서의 위치</h2>
+  <p class="sub">데이팅 앱의 수익성과 심리테스트의 확산력을 하나로</p>
+  <div class="grow">
+    <div class="card" style="padding:8px 6px;">
+      <table>
+        <tr><th style="width:1.7in;"></th><th>기존 데이팅 앱</th><th>심리테스트 콘텐츠</th><th style="background:var(--rose-bg); border-radius:8px 8px 0 0;">스캔톡</th></tr>
+        <tr><td><b>고객 획득</b></td><td class="muted">광고비 (높은 CAC)</td><td class="muted">바이럴 (수익화 부재)</td><td style="background:#fdf5f6;"><b>바이럴 검사가 CAC 대체</b></td></tr>
+        <tr><td><b>첫 대화 부담</b></td><td class="muted">사용자가 직접</td><td class="muted">—</td><td style="background:#fdf5f6;"><b>AI봇이 대신</b></td></tr>
+        <tr><td><b>거절 경험</b></td><td class="muted">노출됨 (읽씹·언매칭)</td><td class="muted">—</td><td style="background:#fdf5f6;"><b>구조적으로 없음</b> (양측 수락제)</td></tr>
+        <tr><td><b>데이터 자산</b></td><td class="muted">프로필 사진 중심</td><td class="muted">휘발성 응답</td><td style="background:#fdf5f6;"><b>성향·대화 스타일 축적</b></td></tr>
+        <tr><td><b>결제 근거</b></td><td class="muted">기능 잠금 해제</td><td class="muted">—</td><td style="background:#fdf5f6;"><b>"진짜 연결"의 순간</b></td></tr>
+      </table>
+    </div>
+    <div class="band" style="margin-top:20px;">
+      <p style="font-size:14px;"><b>해자 Moat</b> — 유저가 쌓일수록 봇 대화 데이터 → 호감도 지수 정확도 → 매칭 품질이 강화되는 <b>데이터 플라이휠</b>. 콘텐츠 시리즈가 늘수록 유입 채널도 복리로 확장.</p>
+    </div>
+  </div>
+  <div class="ghost">08</div>
+  <div class="foot"><span>SCANTALK</span><span>09</span></div>
+</section>
+
+<!-- 10. RISK -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Risk &amp; Mitigation</span><span class="brand">SCANTALK</span></div>
+  <h2>리스크는 알고 있고, 대응은 설계되어 있다</h2>
+  <p class="sub">각 리스크의 대응이 이미 라운드 계획 안에 배치되어 있다</p>
+  <div class="grow">
+    <div class="cols" style="margin-bottom:20px;">
+      <div class="col card hero">
+        <h3 class="accent">콜드 스타트</h3>
+        <p class="muted" style="font-size:12.5px;">초기 유저가 적으면 봇이 대화할 상대가 없다.</p>
+        <p style="font-size:12.5px; margin-top:8px;"><b>→ R1 사전신청자를 모아 같은 날 동시 오픈.</b> 초기 밀도를 인위적으로 확보.</p>
+      </div>
+      <div class="col card hero">
+        <h3 class="accent">AI 비용 폭주</h3>
+        <p class="muted" style="font-size:12.5px;">봇↔봇 대화는 유저가 없어도 API가 돈다.</p>
+        <p style="font-size:12.5px; margin-top:8px;"><b>→ 동시 상대 3명·턴 수·배치 주기 상한</b> + 유저당 일일 비용 캡 + 대시보드 실시간 모니터링.</p>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="col card hero">
+        <h3 class="accent">법적 · 윤리</h3>
+        <p class="muted" style="font-size:12.5px;">내 데이터로 봇이 나 몰래 대화하는 구조.</p>
+        <p style="font-size:12.5px; margin-top:8px;"><b>→ 가입 시 명시 동의 + 봇 발언 면책 고지</b> + 개인정보 발화 금지 가드레일 + R4 전 성인 인증 + 탈퇴 시 완전 삭제.</p>
+      </div>
+      <div class="col card hero">
+        <h3 class="accent">기대 관리</h3>
+        <p class="muted" style="font-size:12.5px;">"호감도 90%인데 만나보니 별로"</p>
+        <p style="font-size:12.5px; margin-top:8px;"><b>→ 호감도는 '대화 궁합' 지표임을 UX 전반에 명시.</b> 과잉 약속 문구 금지 원칙.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">09</div>
+  <div class="foot"><span>SCANTALK</span><span>10</span></div>
+</section>
+
+<!-- 11. TEAM -->
+<section class="slide">
+  <div class="head"><span class="eyebrow">Team</span><span class="brand">SCANTALK</span></div>
+  <h2>팀</h2>
+  <p class="sub">이미 만든 것으로 실행력을 증명한다</p>
+  <div class="grow">
+    <div class="placeholder">
+      [작성 필요] 창업자·핵심 멤버의 이름, 역할, 관련 경력을 여기에 채워주세요.<br>
+      권장 구성 — ① 대표: 이 문제에 대한 개인적 통찰(왜 나인가) · ② 제품/개발 역량 증빙 · ③ 콘텐츠/그로스 담당 여부
+    </div>
+    <div class="cols" style="margin-top:20px;">
+      <div class="col card hero">
+        <h3>이미 증명된 실행력</h3>
+        <p class="muted" style="font-size:13px;">기획 → 설계 문서 8종 → 카톡 분석 MVP 전체 기능(인증·결제 흐름·관리자 검수·AI 리포트) 개발 완료까지 단독 실행.</p>
+      </div>
+      <div class="col card hero">
+        <h3>검증 체계까지 설계</h3>
+        <p class="muted" style="font-size:13px;">v2 기획과 라운드별 게이트, KPI 통과 기준, 측정 인프라(이벤트 DB·GA4·PostHog·인사이트 대시보드)까지 수립 완료.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">10</div>
+  <div class="foot"><span>SCANTALK</span><span>11</span></div>
+</section>
+
+<!-- 12. ASK -->
+<section class="slide dark">
+  <div class="head"><span class="eyebrow">The Ask</span><span class="brand">SCANTALK</span></div>
+  <h2>투자 제안</h2>
+  <p class="sub">투자금이 사는 것은 약속이 아니라, 검증된 라운드다</p>
+  <div class="grow">
+    <div class="cols" style="align-items:stretch;">
+      <div class="col" style="flex:1.1;">
+        <div class="placeholder">
+          [작성 필요] 유치 금액 · 밸류에이션 · 투자 형태(SAFE/보통주 등)를 확정 후 기입해주세요.
+        </div>
+        <h3 style="margin-top:22px; color:var(--rose2);">자금 사용 계획 <span style="font-weight:600; font-size:12px; color:var(--mut-d);">(구조 제안)</span></h3>
+        <div style="margin-top:12px;">
+          <div class="bar-row"><div class="bar-label" style="color:#f6f2eb;">제품 개발</div><div class="bar-track"><div class="bar-fill" style="width:40%;">40%</div></div></div>
+          <div class="bar-row"><div class="bar-label" style="color:#f6f2eb;">콘텐츠·그로스</div><div class="bar-track"><div class="bar-fill" style="width:30%;">30%</div></div></div>
+          <div class="bar-row"><div class="bar-label" style="color:#f6f2eb;">AI 인프라</div><div class="bar-track"><div class="bar-fill" style="width:15%;">15%</div></div></div>
+          <div class="bar-row"><div class="bar-label" style="color:#f6f2eb;">운영·법률·인증</div><div class="bar-track"><div class="bar-fill" style="width:15%;">15%</div></div></div>
+        </div>
+      </div>
+      <div class="col" style="flex:0.9;">
+        <div class="card" style="height:100%;">
+          <h3 style="color:var(--rose2);">마일스톤 — 검증된 라운드를 산다</h3>
+          <table style="margin-top:8px;">
+            <tr><td style="width:0.95in; color:#f6f2eb;"><b>~1개월</b></td><td class="muted">R1 완료 — 바이럴 퍼널 실측 데이터</td></tr>
+            <tr><td style="color:#f6f2eb;"><b>~2.5개월</b></td><td class="muted">R2·R3 완료 — 봇 대화 리텐션 검증</td></tr>
+            <tr><td style="color:#f6f2eb;"><b>~4개월</b></td><td class="muted">R4 완료 — 첫 매칭 결제 전환율 확보</td></tr>
+            <tr><td style="color:#f6f2eb;"><b>이후</b></td><td class="muted">검증 데이터 기반 본격 그로스 / 후속 라운드</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ghost">11</div>
+  <div class="foot"><span>SCANTALK · CONFIDENTIAL</span><span>12</span></div>
+</section>
+
+<!-- 13. CLOSING -->
+<section class="slide dark">
+  <div class="grow" style="align-items:flex-start;">
+    <div class="eyebrow" style="margin-bottom:22px;">ScanTalk</div>
+    <p class="big-quote" style="font-size:42px; max-width:10.5in; letter-spacing:-1.5px;">사람들은 이미 심리테스트를 <span style="color:var(--rose2);">공유</span>하고 있다.<br>우리는 그 공유가 <span style="color:var(--rose2);">만남</span>이 되게 한다.</p>
+    <div style="margin-top:54px;">
+      <p style="font-size:16px; font-weight:800;">스캔톡 ScanTalk</p>
+      <p class="muted" style="font-size:13px;">Contact · playchan6954@gmail.com</p>
+    </div>
+  </div>
+  <div class="foot"><span>SCANTALK · CONFIDENTIAL · 2026.07</span><span>13</span></div>
+</section>
+
+</body>
+</html>
