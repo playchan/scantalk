@@ -2,14 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { QUESTIONS, calcQuizResult, getResultTypeDef, type Answers } from '@/lib/quiz/marriage'
+import {
+  GENDER_KEY,
+  GENDER_LABELS,
+  calcQuizResult,
+  getResultTypeDef,
+  questionsForGender,
+  type Answers,
+  type Gender,
+} from '@/lib/quiz/marriage'
 import { saveQuizResult, trackQuizComplete } from '@/app/actions/quiz'
 import { trackEvent } from '@/app/actions/tracking'
 import ResultContent from './ResultContent'
 
 export const ANSWERS_STORAGE_KEY = 'st_quiz_marriage_answers'
 
-type Stage = 'intro' | 'questions' | 'preview' | 'result'
+type Stage = 'intro' | 'gender' | 'questions' | 'preview' | 'result'
 
 interface QuizFlowProps {
   isLoggedIn: boolean
@@ -20,6 +28,7 @@ interface QuizFlowProps {
 export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowProps) {
   const router = useRouter()
   const [stage, setStage] = useState<Stage>('intro')
+  const [gender, setGender] = useState<Gender | null>(null)
   const [index, setIndex] = useState(0)
   const [answers, setAnswers] = useState<Answers>({})
   const [isSaving, setIsSaving] = useState(false)
@@ -33,26 +42,35 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
     void trackEvent('quiz_view')
   }, [previewMode])
 
-  const question = QUESTIONS[index]
-  const progress = Math.round((index / QUESTIONS.length) * 100)
+  const activeQuestions = gender ? questionsForGender(gender) : []
+  const question = activeQuestions[index]
+  const progress =
+    activeQuestions.length > 0 ? Math.round((index / activeQuestions.length) * 100) : 0
 
   function handleStart() {
-    setStage('questions')
+    setStage('gender')
+  }
+
+  function handleGenderSelect(selected: Gender) {
+    setGender(selected)
+    setAnswers({ [GENDER_KEY]: selected })
     setIndex(0)
+    setStage('questions')
     if (!previewMode) void trackEvent('quiz_start')
   }
 
   function handleRetake() {
-    setAnswers({})
+    setAnswers(gender ? { [GENDER_KEY]: gender } : {})
     setIndex(0)
-    setStage('questions')
+    setStage(gender ? 'questions' : 'gender')
   }
 
   function handleSelect(optionId: string) {
+    if (!question) return
     const next: Answers = { ...answers, [question.id]: optionId }
     setAnswers(next)
 
-    if (index < QUESTIONS.length - 1) {
+    if (index < activeQuestions.length - 1) {
       setIndex(index + 1)
       return
     }
@@ -76,7 +94,7 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
 
   function handleBack() {
     if (index > 0) setIndex(index - 1)
-    else setStage('intro')
+    else setStage('gender')
   }
 
   async function handleReveal() {
@@ -123,11 +141,33 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
             >
               테스트 시작하기
             </button>
-            <p className="text-xs text-gray-400 mt-4">36개 질문 · 약 5분 · 가입 없이 바로 시작</p>
+            <p className="text-xs text-gray-400 mt-4">59개 질문 · 약 7분 심층 분석 · 가입 없이 바로 시작</p>
           </div>
         )}
 
-        {stage === 'questions' && (
+        {stage === 'gender' && (
+          <div className="flex-1 flex flex-col items-center justify-center text-center">
+            <h2 className="text-2xl font-bold text-gray-900 leading-snug mb-2">
+              당신의 성별을<br />선택해주세요
+            </h2>
+            <p className="text-sm text-gray-500 mb-8">성별에 따라 맞춤 문항이 제공됩니다</p>
+            <div className="grid grid-cols-2 gap-3 w-full">
+              {(['male', 'female'] as Gender[]).map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => handleGenderSelect(g)}
+                  className="py-8 rounded-2xl border border-gray-200 bg-white hover:border-rose-300 hover:bg-rose-50/50 transition-colors"
+                >
+                  <span className="block text-4xl mb-2">{g === 'male' ? '🙋‍♂️' : '🙋‍♀️'}</span>
+                  <span className="text-base font-bold text-gray-800">{GENDER_LABELS[g]}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {stage === 'questions' && question && (
           <div className="flex-1 flex flex-col pt-4">
             {/* 진행바 */}
             <div className="flex items-center gap-3 mb-8">
@@ -145,8 +185,8 @@ export default function QuizFlow({ isLoggedIn, previewMode = false }: QuizFlowPr
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="text-xs font-semibold text-gray-400 w-10 text-right">
-                {index + 1}/{QUESTIONS.length}
+              <span className="text-xs font-semibold text-gray-400 w-12 text-right">
+                {index + 1}/{activeQuestions.length}
               </span>
             </div>
 

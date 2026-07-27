@@ -1,6 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { QUESTIONS, RESULT_TYPE_LIST, AXIS_LABELS, CATEGORY_LABELS } from '@/lib/quiz/marriage'
+import {
+  QUESTIONS,
+  RESULT_TYPE_LIST,
+  AXIS_LABELS,
+  CATEGORY_LABELS,
+  GENDER_LABELS,
+} from '@/lib/quiz/marriage'
 
 export const metadata: Metadata = {
   title: '[검수] 문항·유형 전체 — 스캔톡',
@@ -90,11 +96,11 @@ export default function QuizTypesReviewPage() {
           })}
         </div>
 
-        {/* 문항 36개 */}
-        <h2 className="text-base font-bold text-gray-900 mb-1">문항 36개 (약 5분)</h2>
+        {/* 문항 62종 */}
+        <h2 className="text-base font-bold text-gray-900 mb-1">문항 62종 — 남/녀 각 59문항 응답 (약 7분)</h2>
         <p className="text-xs text-gray-400 mb-3">
           카테고리: 프로필·취향은 AI봇 프로필 재료(축 영향 없음), 성격·상황은 성향 축 산출.
-          구조(카테고리·축 매핑)는 유지하고 텍스트만 교체 가능.
+          성별 배지가 있는 문항은 해당 성별에게만 출제. 구조(카테고리·성별·축 매핑)는 유지하고 텍스트만 교체 가능.
         </p>
         <div className="space-y-3">
           {QUESTIONS.map((q, i) => (
@@ -102,9 +108,20 @@ export default function QuizTypesReviewPage() {
               <h3 className="text-sm font-bold text-gray-900 mb-1">
                 Q{i + 1}. {q.title}
               </h3>
-              <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-500 mb-3">
+              <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-500 mb-3 mr-1">
                 {CATEGORY_LABELS[q.category]}
               </span>
+              {q.genderOnly && (
+                <span
+                  className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 ${
+                    q.genderOnly === 'male'
+                      ? 'bg-blue-50 text-blue-500'
+                      : 'bg-pink-50 text-pink-500'
+                  }`}
+                >
+                  {GENDER_LABELS[q.genderOnly]} 전용
+                </span>
+              )}
               <ul className="space-y-2">
                 {q.options.map((o) => (
                   <li key={o.id} className="flex items-center justify-between gap-2 text-sm">
