@@ -56,7 +56,11 @@ export default async function QuizResultPage({ params }: PageProps) {
         <ResultContent probability={result.probability} typeDef={typeDef} axes={axes} />
 
         {/* 공유 */}
-        <ShareActions resultId={result.id} />
+        <ShareActions
+          resultId={result.id}
+          typeName={result.result_type}
+          probability={result.probability}
+        />
 
         {/* 사전신청 CTA */}
         <PreregSection quizResultId={result.id} alreadyRegistered={prereg !== null} />

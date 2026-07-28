@@ -5,6 +5,8 @@ import { trackEvent } from '@/app/actions/tracking'
 
 interface ShareActionsProps {
   resultId: string
+  typeName: string
+  probability: number
 }
 
 // 공유 링크는 결과가 아닌 검사 입구로 — 받은 사람이 자기 검사를 하게 한다
@@ -14,9 +16,11 @@ function buildShareUrl(resultId: string): string {
   return `${origin}/quiz/marriage?utm_source=share&ref=${ref}`
 }
 
-export default function ShareActions({ resultId }: ShareActionsProps) {
+export default function ShareActions({ resultId, typeName, probability }: ShareActionsProps) {
   const [copied, setCopied] = useState(false)
   const viewTracked = useRef(false)
+
+  const shareText = `나 "${typeName}"이래ㅋㅋㅋ 결혼 확률 ${probability}%… 너도 해봐 👀`
 
   useEffect(() => {
     if (viewTracked.current) return
@@ -24,17 +28,20 @@ export default function ShareActions({ resultId }: ShareActionsProps) {
     void trackEvent('result_view')
   }, [])
 
-  async function handleCopyLink() {
-    const url = buildShareUrl(resultId)
-    void trackEvent('share_click', { method: 'link' })
+  async function copyToClipboard(text: string) {
     try {
-      await navigator.clipboard.writeText(url)
+      await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
       // clipboard 미지원 브라우저 — prompt 로 대체
-      window.prompt('아래 링크를 복사하세요', url)
+      window.prompt('아래 내용을 복사하세요', text)
     }
+  }
+
+  async function handleCopyLink() {
+    void trackEvent('share_click', { method: 'link' })
+    await copyToClipboard(`${shareText}\n${buildShareUrl(resultId)}`)
   }
 
   async function handleNativeShare() {
@@ -44,7 +51,7 @@ export default function ShareActions({ resultId }: ShareActionsProps) {
       try {
         await navigator.share({
           title: '내가 결혼할 확률은?',
-          text: '나의 연애 유형과 결혼 확률, 너도 해봐 👀',
+          text: shareText,
           url,
         })
       } catch {
@@ -60,9 +67,15 @@ export default function ShareActions({ resultId }: ShareActionsProps) {
     window.open(`/api/og/marriage/${resultId}`, '_blank')
   }
 
+  function handleSaveStoryImage() {
+    void trackEvent('share_click', { method: 'story' })
+    window.open(`/api/og/marriage/${resultId}?f=story`, '_blank')
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-      <h2 className="text-sm font-bold text-gray-900 mb-4">친구에게 공유하기</h2>
+      <h2 className="text-sm font-bold text-gray-900 mb-1">친구에게 공유하기</h2>
+      <p className="text-xs text-gray-400 mb-4">"{shareText}"</p>
       <div className="grid grid-cols-3 gap-2">
         <button
           type="button"
@@ -86,6 +99,13 @@ export default function ShareActions({ resultId }: ShareActionsProps) {
           이미지 저장
         </button>
       </div>
+      <button
+        type="button"
+        onClick={handleSaveStoryImage}
+        className="w-full mt-2 py-2.5 rounded-xl border border-dashed border-gray-200 hover:border-rose-200 hover:bg-rose-50/50 text-gray-500 text-xs font-semibold transition-colors"
+      >
+        📸 인스타 스토리용 세로 이미지
+      </button>
     </div>
   )
 }
