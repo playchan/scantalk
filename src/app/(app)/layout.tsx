@@ -17,6 +17,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             스캔톡
           </Link>
           <div className="flex items-center gap-2">
+            <Link
+              href="/chat"
+              className="text-xs font-semibold text-gray-600 hover:text-rose-500 px-2 py-1"
+            >
+              💬 챗
+            </Link>
             <span className="text-xs text-gray-400 hidden sm:block truncate max-w-[120px]">
               {user.email}
             </span>
