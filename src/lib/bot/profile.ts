@@ -154,3 +154,10 @@ export function nextAffinity(current: number, messageLength: number): number {
 export function nextSyncRate(current: number): number {
   return Math.min(100, Math.max(SYNC_RATE_START, current) + 1)
 }
+
+/** 싱크로율 단계 명칭 (docs/09 4-1 연출: 30% 어색한 사이 → 60% 닮은꼴 → 90% 또 다른 나) */
+export function syncStageLabel(rate: number): string {
+  if (rate >= 90) return '또 다른 나'
+  if (rate >= 60) return '닮은꼴'
+  return '어색한 사이'
+}
