@@ -23,14 +23,14 @@ function answersByIndex(gender: Gender, optionIndex: number): Answers {
 }
 
 describe('QUESTIONS 구조', () => {
-  test('정의된 문항은 68종이다 (공통 62 + 남녀 전용 각 3)', () => {
-    expect(QUESTIONS).toHaveLength(68)
+  test('정의된 문항은 72종이다 (공통 66 + 남녀 전용 각 3)', () => {
+    expect(QUESTIONS).toHaveLength(72)
   })
 
-  test('남녀 응답 문항 수는 동일하다 (각 65문항)', () => {
-    expect(questionsForGender('male')).toHaveLength(65)
-    expect(questionsForGender('female')).toHaveLength(65)
-    expect(QUESTION_COUNT).toBe(65)
+  test('남녀 응답 문항 수는 동일하다 (각 69문항)', () => {
+    expect(questionsForGender('male')).toHaveLength(69)
+    expect(questionsForGender('female')).toHaveLength(69)
+    expect(QUESTION_COUNT).toBe(69)
   })
 
   test('모든 문항은 4~5지선다이고 옵션 id가 전역에서 고유하다', () => {
