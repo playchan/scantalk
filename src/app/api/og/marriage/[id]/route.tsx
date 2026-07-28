@@ -9,12 +9,12 @@ const STORY_HEIGHT = 1920
 
 // 펜타그램 SVG 좌표 (12시 방향부터 시계방향) — ResultContent와 동일한 축 순서
 const RADAR_ORDER: AxisKey[] = ['expression', 'pace', 'intimacy', 'stability', 'independence']
-const RADAR_SIZE = 300
+const RADAR_SIZE = 260
 const RADAR_CENTER = RADAR_SIZE / 2
-const RADAR_RADIUS = 110
-const LABEL_BOX = { width: 360, height: 340 }
-const LABEL_RADIUS = 140
-const LABEL_CENTER = { x: 180, y: 170 }
+const RADAR_RADIUS = 95
+const LABEL_BOX = { width: 320, height: 300 }
+const LABEL_RADIUS = 125
+const LABEL_CENTER = { x: 160, y: 150 }
 
 function radarPoint(index: number, ratio: number, cx: number, cy: number, r: number): [number, number] {
   const angle = -Math.PI / 2 + (index * 2 * Math.PI) / 5
@@ -120,7 +120,7 @@ export async function GET(
           backgroundImage:
             'radial-gradient(700px 500px at 80% 0%, rgba(224,71,90,0.28), transparent 60%), radial-gradient(600px 500px at 10% 100%, rgba(224,71,90,0.14), transparent 55%)',
           fontFamily: 'Pretendard',
-          padding: isStory ? '120px 60px' : '50px 60px',
+          padding: isStory ? '120px 60px' : '40px 60px',
         }}
       >
         <div style={{ display: 'flex', fontSize: 34, color: '#ff8a94', letterSpacing: 8 }}>
@@ -129,8 +129,8 @@ export async function GET(
 
         {/* 확률 + 이모지 */}
         <div style={{ display: 'flex', alignItems: 'center', marginTop: isStory ? 40 : 16 }}>
-          <div style={{ display: 'flex', fontSize: 130, marginRight: 30 }}>{typeDef.emoji}</div>
-          <div style={{ display: 'flex', fontSize: 210, fontWeight: 700, color: '#e0475a', lineHeight: 1 }}>
+          <div style={{ display: 'flex', fontSize: 120, marginRight: 30 }}>{typeDef.emoji}</div>
+          <div style={{ display: 'flex', fontSize: 180, fontWeight: 700, color: '#e0475a', lineHeight: 1 }}>
             {result.probability}%
           </div>
         </div>
@@ -139,21 +139,21 @@ export async function GET(
         <div
           style={{
             display: 'flex',
-            fontSize: 62,
+            fontSize: 56,
             fontWeight: 700,
             color: '#f6f2eb',
-            marginTop: isStory ? 40 : 18,
+            marginTop: isStory ? 40 : 14,
             textAlign: 'center',
           }}
         >
           {result.result_type}
         </div>
-        <div style={{ display: 'flex', fontSize: 32, color: '#a49dae', marginTop: 14 }}>
+        <div style={{ display: 'flex', fontSize: 30, color: '#a49dae', marginTop: 10 }}>
           "{typeDef.memeLine}"
         </div>
 
         {/* 해시태그 */}
-        <div style={{ display: 'flex', marginTop: isStory ? 40 : 24 }}>
+        <div style={{ display: 'flex', marginTop: isStory ? 40 : 18 }}>
           {keywords.map((keyword) => (
             <div
               key={keyword}
@@ -179,7 +179,7 @@ export async function GET(
             position: 'relative',
             width: LABEL_BOX.width,
             height: LABEL_BOX.height,
-            marginTop: isStory ? 50 : 26,
+            marginTop: isStory ? 50 : 18,
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -213,30 +213,30 @@ export async function GET(
         </div>
 
         {/* 케미 */}
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: isStory ? 46 : 22, fontSize: 27, color: '#d8d2df' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: isStory ? 46 : 16, fontSize: 26, color: '#d8d2df' }}>
           <div style={{ display: 'flex' }}>💚 환상의 케미 · {bestDef ? `${bestDef.emoji} ` : ''}{typeDef.bestMatch}</div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: 10, fontSize: 27, color: '#d8d2df' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: 8, fontSize: 26, color: '#d8d2df' }}>
           <div style={{ display: 'flex' }}>🧨 환장의 케미 · {hardDef ? `${hardDef.emoji} ` : ''}{typeDef.hardMatch}</div>
         </div>
 
         {/* CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: isStory ? 70 : 34 }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: isStory ? 70 : 22 }}>
           <div
             style={{
               display: 'flex',
-              fontSize: 30,
+              fontSize: 28,
               fontWeight: 700,
               color: '#f6f2eb',
               backgroundColor: '#e0475a',
               borderRadius: 999,
-              padding: '16px 40px',
+              padding: '14px 36px',
             }}
           >
             너의 확률은? 👀
           </div>
         </div>
-        <div style={{ display: 'flex', fontSize: 26, color: '#5c5568', marginTop: 20, letterSpacing: 3 }}>
+        <div style={{ display: 'flex', fontSize: 24, color: '#5c5568', marginTop: 16, letterSpacing: 3 }}>
           scantalk.vercel.app · 스캔톡
         </div>
       </div>
