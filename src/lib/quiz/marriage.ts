@@ -53,7 +53,7 @@ export interface QuizQuestion {
   options: QuizOption[]
 }
 
-// 문항 68종 정의 (공통 62 + 남성 전용 3 + 여성 전용 3) — 응답 기준 65문항.
+// 문항 72종 정의 (공통 66 + 남성 전용 3 + 여성 전용 3) — 응답 기준 69문항.
 // 선택지는 4~5개. 애착 이론·사랑의 언어 등 관계심리학 프레임을 참고해 설계.
 // 카피 교체 시 구조(카테고리·성별·축 매핑·p값)는 유지.
 export const QUESTIONS: QuizQuestion[] = [
@@ -374,13 +374,14 @@ export const QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'h5',
-    title: '나의 하루 리듬은',
+    title: '요즘 뜨거운 "부부 각방" 논쟁, 나의 입장은',
     category: 'personality',
     options: [
-      { id: 'h5a', label: '아침형 — 일찍 자고 일찍 일어난다', axis: 'stability', score: 2, p: 1 },
-      { id: 'h5b', label: '규칙적이려고 노력하는 편', axis: 'stability', score: 2, p: 1 },
-      { id: 'h5c', label: '올빼미형 — 밤에 살아난다', axis: 'independence', score: 1, p: 0 },
-      { id: 'h5d', label: '리듬? 그날그날 다르다', axis: 'pace', score: 1, p: -1 },
+      { id: 'h5a', label: '무슨 소리, 한 침대가 국룰이다', axis: 'expression', score: 2, p: 2 },
+      { id: 'h5b', label: '평소엔 같이, 코골이 심한 날만 임시 각방', axis: 'stability', score: 2, p: 2 },
+      { id: 'h5c', label: '수면의 질이 부부의 질. 각방 찬성', axis: 'independence', score: 2, p: 0 },
+      { id: 'h5d', label: '침대는 같이, 이불은 각자 (이게 진리)', axis: 'stability', score: 1, p: 1 },
+      { id: 'h5e', label: '각방이 아니라 각집도 가능 (주말부부 로망)', axis: 'independence', score: 2, p: -1 },
     ],
   },
   {
@@ -545,13 +546,14 @@ export const QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'e6',
-    title: '반려동물이나 식물을 키우는 것에 대해',
+    title: '신혼집 마련, "집은 남자·혼수는 여자" 공식에 대해',
     category: 'personality',
     options: [
-      { id: 'e6a', label: '이미 키우고 있고, 매일이 행복하다', axis: 'stability', score: 3, p: 2 },
-      { id: 'e6b', label: '연인과 함께라면 키워보고 싶다', axis: 'expression', score: 2, p: 3 },
-      { id: 'e6c', label: '귀엽지만 책임질 자신은 아직 없다', axis: 'pace', score: 1, p: 0 },
-      { id: 'e6d', label: '내 몸 하나 챙기기도 벅차다', axis: 'independence', score: 2, p: -1 },
+      { id: 'e6a', label: '이제 그런 공식은 그만. 둘이 모은 만큼 합친다', axis: 'stability', score: 3, p: 2 },
+      { id: 'e6b', label: '형편 되는 쪽이 더 내면 되지, 공식이 왜 필요해', axis: 'expression', score: 2, p: 2 },
+      { id: 'e6c', label: '솔직히 관례는 무시 못 한다고 생각한다', axis: 'pace', score: 1, p: 0 },
+      { id: 'e6d', label: '부모님 찬스 가능하면 감사히 받는다', axis: 'stability', score: 1, p: 1 },
+      { id: 'e6e', label: '집값 얘기 나오는 순간 숨이 막힌다', axis: 'independence', score: 1, p: -1 },
     ],
   },
 
@@ -736,6 +738,56 @@ export const QUESTIONS: QuizQuestion[] = [
     ],
   },
 
+  // ══════ PART 7.8. 요즘 연애 화두 🔥 (논쟁 유발 주의) ══════
+  {
+    id: 'w1',
+    title: '🔥 요즘 최대 떡밥, 데이트 비용. 나의 원칙은',
+    category: 'personality',
+    options: [
+      { id: 'w1a', label: '번갈아 내다 보면 계산이 무의미해진다', axis: 'stability', score: 3, p: 2 },
+      { id: 'w1b', label: '더 벌거나 더 좋아하는 쪽이 조금 더', axis: 'pace', score: 2, p: 1 },
+      { id: 'w1c', label: '무조건 반반. 시작부터 깔끔하게', axis: 'independence', score: 2, p: 1 },
+      { id: 'w1d', label: '데이트 통장 개설. 회계는 투명하게', axis: 'stability', score: 2, p: 2 },
+      { id: 'w1e', label: '이걸로 싸울 관계면 애초에 끝난 관계', axis: 'independence', score: 1, p: 0 },
+    ],
+  },
+  {
+    id: 'w2',
+    title: '🔥 결혼 후, 내 부모님이 배우자를 서운하게 했다',
+    category: 'situation',
+    options: [
+      { id: 'w2a', label: '내 부모는 내가 막는다. 배우자 앞에 선다', axis: 'expression', score: 3, p: 3 },
+      { id: 'w2b', label: '양쪽 이야기 듣고 중간에서 통역·조율한다', axis: 'stability', score: 2, p: 2 },
+      { id: 'w2c', label: '"우리 부모님이 원래 좀 그래…" 하고 넘어간다', axis: 'pace', score: 1, p: -2 },
+      { id: 'w2d', label: '배우자가 어른이니 이해해주길 바란다', axis: 'independence', score: 1, p: -2 },
+      { id: 'w2e', label: '일단 가족 단톡방부터 조용히 나간다', axis: 'independence', score: 2, p: 0 },
+    ],
+  },
+  {
+    id: 'w3',
+    title: '🔥 "우리 서로 폰 오픈할까?" 연인의 제안에 나는',
+    category: 'situation',
+    options: [
+      { id: 'w3a', label: '좋아, 어차피 볼 것도 없다. 즉시 오픈', axis: 'expression', score: 2, p: 2 },
+      { id: 'w3b', label: '오픈은 하되 서로 예의는 지키기로 약속', axis: 'stability', score: 2, p: 2 },
+      { id: 'w3c', label: '신뢰가 있는데 왜? 사생활은 정중히 거절', axis: 'independence', score: 3, p: 0 },
+      { id: 'w3d', label: '알겠다고 하고 몰래 대화방부터 정리한다', axis: 'pace', score: 1, p: -2 },
+      { id: 'w3e', label: '"그럼 통장도 오픈?" 판을 키운다', axis: 'intimacy', score: 1, p: 1 },
+    ],
+  },
+  {
+    id: 'w4',
+    title: '🔥 연인이 이성 절친과 단둘이 새벽까지 술을 마셨다',
+    category: 'situation',
+    options: [
+      { id: 'w4a', label: '서운하면 서운하다고 그날 바로 말한다', axis: 'expression', score: 3, p: 2 },
+      { id: 'w4b', label: '"다음엔 미리 말해줘" 규칙을 정한다', axis: 'stability', score: 3, p: 2 },
+      { id: 'w4c', label: '절친은 절친. 쿨하게 넘긴다', axis: 'independence', score: 2, p: 1 },
+      { id: 'w4d', label: '나도 이성 친구와 새벽 술로 맞대응한다', axis: 'pace', score: 1, p: -2 },
+      { id: 'w4e', label: '그 절친과 친해져서 내 편으로 만든다', axis: 'intimacy', score: 2, p: 1 },
+    ],
+  },
+
   // ══════ PART 8. 결혼이라는 미래 ══════
   {
     id: 'k1',
@@ -873,7 +925,7 @@ export interface QuizResultData {
 const PROBABILITY_MIN = 35
 const PROBABILITY_MAX = 95
 const PROBABILITY_BASE = 50
-// 59문항 p 합계를 35~95 범위에 맞게 스케일링
+// 69문항 p 합계를 35~95 범위에 맞게 스케일링
 const PROBABILITY_SCALE = 0.5
 
 export interface ResultTypeDef {
@@ -897,9 +949,9 @@ export interface ResultTypeDef {
 // 확률 구간(high/mid/low) × 주도 성향 축(4축) = 12유형
 const RESULT_TYPES: Record<string, ResultTypeDef> = {
   'high-expression': {
-    name: '직진 로맨티스트',
+    name: '브레이크 고장난 직진기관차',
     emoji: '🚀',
-    memeLine: '식장 예약이 제일 빠른 유형',
+    memeLine: '고백까지 3일, 상견례까지 3개월',
     keywords: ['직진본능', '표현부자', '금사빠아님_진심임', '결혼선봉대'],
     summary:
       '마음이 향하면 계산하지 않고 직진하는 타입입니다. 좋아하면 좋아한다고 말하고, 보고 싶으면 보고 싶다고 말합니다. 그 솔직함이 상대에게는 세상에서 가장 확실한 안정감이 됩니다. 사랑에 있어서 "나중에"라는 말을 믿지 않는 사람입니다.',
@@ -914,11 +966,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '표현의 크기보다 빈도를 조절해보세요. 잔잔하게 오래가 더 강합니다',
       '가끔은 받는 연습도 필요해요. 사랑은 주고받는 캐치볼입니다',
     ],
-    bestMatch: '신중한 온기형',
-    hardMatch: '썸 전문가',
+    bestMatch: '100시간 우린 곰탕형',
+    hardMatch: '썸만 100번째인 환승러',
   },
   'high-pace': {
-    name: '초고속 골인형',
+    name: '혼인신고 3분컷 속도광',
     emoji: '🚄',
     memeLine: '만난 지 100일에 상견례 가능',
     keywords: ['속전속결', '결정장애_그게뭐죠', 'KTX연애', '골인각_재는중'],
@@ -935,13 +987,13 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '속도를 늦추는 게 아니라 보폭을 맞추는 겁니다. 함께 가야 골인입니다',
       '결정 전 하루의 숙성 시간을 가져보세요. 확신은 사라지지 않습니다',
     ],
-    bestMatch: '따뜻한 계획형',
-    hardMatch: '느긋한 마이웨이형',
+    bestMatch: '국가공인 배우자감',
+    hardMatch: '감나무 밑 거북이',
   },
   'high-stability': {
-    name: '따뜻한 계획형',
+    name: '국가공인 배우자감',
     emoji: '🏡',
-    memeLine: '상견례 날짜부터 잡는 유형',
+    memeLine: '어른들이 제일 좋아하는 바로 그 유형',
     keywords: ['신뢰적금', '연애도_장기투자', '준비된배우자', '안정감맛집'],
     summary:
       '관계를 벽돌 쌓듯 차곡차곡 만들어가는 타입입니다. 화려한 이벤트보다 매일 같은 시간의 연락, 약속을 지키는 꾸준함으로 사랑을 증명합니다. 시간이 지날수록 진가가 드러나는 사람 — 3개월보다 3년이 더 기대되는 연애를 합니다.',
@@ -956,11 +1008,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '가끔은 계획 없는 하루를 선물해보세요. 즉흥도 연습하면 늘어요',
       '상대의 감정 기복을 "비효율"로 보지 말고 날씨처럼 받아들여 보세요',
     ],
-    bestMatch: '설레는 탐색가',
-    hardMatch: '자유로운 불꽃형',
+    bestMatch: '금사빠 전과 12범',
+    hardMatch: '연애보다 내 인생 꿀잼파',
   },
   'high-independence': {
-    name: '츤데레 순정파',
+    name: '겉바속촉 츤데레',
     emoji: '😼',
     memeLine: '겉은 시크, 속은 이미 웨딩플래너',
     keywords: ['츤데레인증', '무심한듯_다챙김', '속마음은_순정만화', '반전매력'],
@@ -977,12 +1029,12 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '"표현 안 해도 알겠지"는 없습니다. 최소한의 언어화 연습을 하세요',
       '상대의 애정 표현을 부담스러워하지 말고 "고마워" 한마디로 받아주세요',
     ],
-    bestMatch: '직진 로맨티스트',
-    hardMatch: '밀당의 아티스트',
+    bestMatch: '브레이크 고장난 직진기관차',
+    hardMatch: '읽씹 담당 국가대표',
   },
   'mid-expression': {
-    name: '설레는 탐색가',
-    emoji: '🧭',
+    name: '금사빠 전과 12범',
+    emoji: '💘',
     memeLine: '운명의 상대 만나면 급발진 예정',
     keywords: ['설렘수집가', '잠재력만렙', '아직_간보는중', '급발진주의'],
     summary:
@@ -998,11 +1050,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '설렘은 시작 신호일 뿐, 편안함이 진짜 본편입니다',
       '비교 대상을 늘리기보다 눈앞의 한 사람을 깊게 들여다보세요',
     ],
-    bestMatch: '따뜻한 계획형',
-    hardMatch: '거리조절 마스터',
+    bestMatch: '국가공인 배우자감',
+    hardMatch: '안전거리 확보 상습범',
   },
   'mid-pace': {
-    name: '밀당의 아티스트',
+    name: '읽씹 담당 국가대표',
     emoji: '🎭',
     memeLine: '읽씹도 전략, 답장도 예술',
     keywords: ['밀당장인', '연애는_심리전', '타이밍의신', '어장아님_전략임'],
@@ -1019,13 +1071,13 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '상대가 지쳐 보이면 즉시 당기세요. 그 타이밍만은 계산하지 마세요',
       '"나 사실 너 좋아해"를 이길 전략은 없습니다',
     ],
-    bestMatch: '자유로운 불꽃형',
-    hardMatch: '직진 로맨티스트',
+    bestMatch: '연애보다 내 인생 꿀잼파',
+    hardMatch: '브레이크 고장난 직진기관차',
   },
   'mid-stability': {
-    name: '신중한 온기형',
+    name: '100시간 우린 곰탕형',
     emoji: '🕯️',
-    memeLine: '슬로우쿠커처럼 서서히 끓는 중',
+    memeLine: '끓는 데 오래 걸림, 식는 덴 더 오래 걸림',
     keywords: ['느리지만_확실하게', '곰탕같은사랑', '진국인증', '천천히_뜨거워짐'],
     summary:
       '겉은 차분하지만 속은 누구보다 따뜻한 타입입니다. 마음을 여는 데 시간이 걸리지만, 한번 열리면 그 온기가 쉽게 식지 않습니다. 당신의 진가를 아는 사람만이 그 온기를 누릴 수 있습니다.',
@@ -1040,11 +1092,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '"천천히"와 "멈춤"은 다릅니다. 느려도 계속 움직이세요',
       '상대의 빠른 속도를 가벼움으로 단정하지 마세요. 스타일 차이일 뿐입니다',
     ],
-    bestMatch: '직진 로맨티스트',
-    hardMatch: '썸 전문가',
+    bestMatch: '브레이크 고장난 직진기관차',
+    hardMatch: '썸만 100번째인 환승러',
   },
   'mid-independence': {
-    name: '거리조절 마스터',
+    name: '안전거리 확보 상습범',
     emoji: '📏',
     memeLine: '가까이 오면 한 발, 멀어지면 반 발',
     keywords: ['거리의미학', '고슴도치딜레마', '혼자도_둘도_좋아', '적정온도유지'],
@@ -1061,11 +1113,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '"괜찮아"가 아니라 "보고 싶어"라고 말하는 연습을 해보세요',
       '경계선을 지키되, 그 선 위에서 손은 잡아주세요',
     ],
-    bestMatch: '츤데레 순정파',
-    hardMatch: '초고속 골인형',
+    bestMatch: '겉바속촉 츤데레',
+    hardMatch: '혼인신고 3분컷 속도광',
   },
   'low-expression': {
-    name: '자유로운 불꽃형',
+    name: '연애보다 내 인생 꿀잼파',
     emoji: '🔥',
     memeLine: '결혼? 아직은 내 인생이 더 재밌음',
     keywords: ['내인생이_메인디쉬', '자유영혼', '불꽃주의보', '묶이면_도망감'],
@@ -1082,11 +1134,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '자유를 지키고 싶다면, 그만큼 안심을 선물하세요',
       '"나중에 여유되면 연애해야지"의 나중은 오지 않습니다',
     ],
-    bestMatch: '밀당의 아티스트',
-    hardMatch: '따뜻한 계획형',
+    bestMatch: '읽씹 담당 국가대표',
+    hardMatch: '국가공인 배우자감',
   },
   'low-pace': {
-    name: '썸 전문가',
+    name: '썸만 100번째인 환승러',
     emoji: '🎢',
     memeLine: '설렘 구간만 무한 환승 중',
     keywords: ['썸신', '시작이_제일_재밌어', '환승의달인', '롤러코스터만_탐'],
@@ -1103,11 +1155,11 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '"확정"을 두려워하지 마세요. 썸의 기술은 연애에서도 쓸 수 있습니다',
       '이번에 만나는 사람과는 3개월만 더 가보세요. 본편이 시작됩니다',
     ],
-    bestMatch: '설레는 탐색가',
-    hardMatch: '신중한 온기형',
+    bestMatch: '금사빠 전과 12범',
+    hardMatch: '100시간 우린 곰탕형',
   },
   'low-stability': {
-    name: '완벽주의 대기만성형',
+    name: '준비만 N년째 완벽주의자',
     emoji: '⏳',
     memeLine: '준비가 끝나야 사랑도 시작이지',
     keywords: ['준비완료후_출발', '완벽주의연애', '대기만성', '내기준이_높은편'],
@@ -1124,13 +1176,13 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '부족한 채로 만나서 함께 채워가는 것도 계획의 일부로 넣어보세요',
       '스스로에게 관대해지는 만큼 인연의 문도 넓어집니다',
     ],
-    bestMatch: '초고속 골인형',
-    hardMatch: '자유로운 불꽃형',
+    bestMatch: '혼인신고 3분컷 속도광',
+    hardMatch: '연애보다 내 인생 꿀잼파',
   },
   'low-independence': {
-    name: '느긋한 마이웨이형',
+    name: '감나무 밑 거북이',
     emoji: '🐢',
-    memeLine: '인연은 오는 것, 쫓는 것 아님',
+    memeLine: '입 벌리고 감 떨어지길 기다리는 중',
     keywords: ['거북이전략', '조급함제로', '올사람은온다', '마이페이스'],
     summary:
       '서두를 이유가 전혀 없는 타입입니다. "때가 되면 만나겠지"라는 태도는 무심함이 아니라 자신에 대한 깊은 믿음에서 나오는 여유입니다.',
@@ -1145,8 +1197,8 @@ const RESULT_TYPES: Record<string, ResultTypeDef> = {
       '한 달에 한 번은 새로운 모임에 나가보세요. 확률은 움직여야 올라갑니다',
       '마음에 드는 사람에게는 평소보다 딱 한 템포만 빠르게 반응해보세요',
     ],
-    bestMatch: '자유로운 불꽃형',
-    hardMatch: '직진 로맨티스트',
+    bestMatch: '연애보다 내 인생 꿀잼파',
+    hardMatch: '브레이크 고장난 직진기관차',
   },
 }
 
