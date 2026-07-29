@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { syncStageLabel, AFFINITY_MATCH_THRESHOLD, type BotProfile } from '@/lib/bot/profile'
+import MatchProposalActions from './MatchProposalActions'
 
 export const metadata = { title: '나의 AI — 스캔톡' }
 
@@ -88,6 +89,8 @@ export default async function MyAiPage() {
         </p>
       </div>
 
+      <MatchSections userId={user.id} />
+
       {/* 상대별 호감도 — 내용은 비공개, 수치만 */}
       <h2 className="text-sm font-bold text-gray-900 mb-2">봇이 만나고 있는 상대</h2>
       {partnerChats.length === 0 ? (
@@ -131,5 +134,76 @@ export default async function MyAiPage() {
         호감도 {AFFINITY_MATCH_THRESHOLD}%에 도달하면 진짜 매칭을 제안해드려요
       </p>
     </div>
+  )
+}
+
+// 매칭 요청(내 봇의 주인인 나에게 온 것) + 성사된 매칭 목록
+async function MatchSections({ userId }: { userId: string }) {
+  const admin = createAdminClient()
+  const { data: matches } = await admin
+    .from('bot_matches')
+    .select('id, status, requester_id, owner_id, created_at')
+    .or(`requester_id.eq.${userId},owner_id.eq.${userId}`)
+    .order('created_at', { ascending: false })
+
+  const proposals = (matches ?? []).filter((m) => m.owner_id === userId && m.status === 'proposed')
+  const matched = (matches ?? []).filter((m) => m.status === 'matched')
+
+  // 상대 식별은 익명 닉네임(상대의 봇 이름)으로만
+  const counterpartIds = [
+    ...proposals.map((m) => m.requester_id),
+    ...matched.map((m) => (m.requester_id === userId ? m.owner_id : m.requester_id)),
+  ]
+  const { data: counterpartBots } = counterpartIds.length
+    ? await admin.from('bots').select('user_id, nickname').in('user_id', counterpartIds)
+    : { data: [] }
+  const nickByUser = new Map((counterpartBots ?? []).map((b) => [b.user_id, b.nickname]))
+
+  if (proposals.length === 0 && matched.length === 0) return null
+
+  return (
+    <>
+      {proposals.length > 0 && (
+        <>
+          <h2 className="text-sm font-bold text-gray-900 mb-2">💌 나에게 온 매칭 요청</h2>
+          <div className="space-y-2 mb-5">
+            {proposals.map((m) => (
+              <div key={m.id} className="bg-white rounded-2xl border border-rose-100 shadow-sm p-4">
+                <p className="text-sm font-bold text-gray-900">
+                  『{nickByUser.get(m.requester_id) ?? '익명'}』님이 실제 대화를 원해요
+                </p>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  당신의 봇과 호감도 {AFFINITY_MATCH_THRESHOLD}%를 쌓은 상대예요
+                </p>
+                <MatchProposalActions matchId={m.id} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {matched.length > 0 && (
+        <>
+          <h2 className="text-sm font-bold text-gray-900 mb-2">🎉 성사된 매칭</h2>
+          <div className="space-y-2 mb-5">
+            {matched.map((m) => {
+              const counterpartId = m.requester_id === userId ? m.owner_id : m.requester_id
+              return (
+                <Link
+                  key={m.id}
+                  href={`/match/${m.id}`}
+                  className="flex items-center justify-between bg-rose-500 rounded-2xl p-4 text-white hover:bg-rose-600 transition-colors"
+                >
+                  <p className="text-sm font-bold">
+                    💬 {nickByUser.get(counterpartId) ?? '익명'}님과의 실제 대화
+                  </p>
+                  <span className="text-xs">→</span>
+                </Link>
+              )
+            })}
+          </div>
+        </>
+      )}
+    </>
   )
 }
