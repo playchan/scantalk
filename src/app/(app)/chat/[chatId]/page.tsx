@@ -42,11 +42,19 @@ export default async function ChatRoomPage({ params }: PageProps) {
 
   const isOwnBot = bot.user_id === user.id
 
+  const { data: match } = await admin
+    .from('bot_matches')
+    .select('id, status')
+    .eq('chat_id', chatId)
+    .maybeSingle()
+
   return (
     <ChatRoom
       chatId={chatId}
       botNickname={bot.nickname}
       isOwnBot={isOwnBot}
+      matchStatus={match?.status ?? null}
+      matchId={match?.id ?? null}
       initialAffinity={chat.affinity}
       initialSyncRate={bot.sync_rate}
       initialMessages={(messages ?? []).map((m) => ({
